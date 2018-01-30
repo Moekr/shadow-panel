@@ -19,7 +19,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 @CommonsLog
-public class InstanceImpl implements Instance {
+class InstanceImpl implements Instance {
 	@Getter
 	private final String address;
 	private final RpcConfiguration rpcConfiguration;

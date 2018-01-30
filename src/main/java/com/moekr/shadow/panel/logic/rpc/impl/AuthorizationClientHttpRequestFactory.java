@@ -7,7 +7,7 @@ import org.springframework.util.Base64Utils;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 
-public class AuthorizationClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
+class AuthorizationClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
 	private static final String HTTP_BASIC_PREFIX = "Basic ";
 
 	private String authorization;
