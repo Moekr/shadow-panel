@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset='utf-8'/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
+    <meta name="theme-color" content="#C8C8C8"/>
+    <title>Error | Shadow Panel</title>
+</head>
+<body>
+<div>
+    <h1>Oops，error occurred……</h1>
+    <p th:text="'Code: '+${error}"></p>
+    <p th:text="'Message: '+${message}"></p>
+    <p><a th:href="@{/}" th:text="Back"></a></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/shadow_panel?useUnicode=true&characterEncoding=UTF-8&useSSL=true
+    username: root
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
+security:
+  user:
+    name: admin
+    password: password
+
+shadow:
+  rpc:
+    scheme: http
+    port: 8080
+    authorization:
+      username: admin
+      password: password

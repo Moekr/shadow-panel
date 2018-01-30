@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    tomcat:
+      log-abandoned: false
+      remove-abandoned: true
+      remove-abandoned-timeout: 60
+      min-evictable-idle-time-millis: 600000
+      time-between-eviction-runs-millis: 300000
+      max-wait: 5000
+      test-while-idle: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  thymeleaf:
+    mode: LEGACYHTML5
+endpoints:
+  shutdown:
+    enabled: true
+management:
+  context-path: /api
+  add-application-context-header: false
