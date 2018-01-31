@@ -138,6 +138,9 @@ public class NodeManagerImpl implements NodeManager {
 				Map<Integer, Long> traffic = statistic.getTraffic();
 				long used = 0;
 				for (Map.Entry<Integer, Long> trafficEntry : traffic.entrySet()) {
+					if (trafficEntry.getValue() <= 0 ) {
+						continue;
+					}
 					User user = userDAO.findByPort(trafficEntry.getKey());
 					if (user != null) {
 						Record record = new Record();
