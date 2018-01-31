@@ -29,7 +29,7 @@ public class RecordServiceImpl implements RecordService {
 	@Override
 	public String hourData(int userId) {
 		List<HourData> dataList = recordDAO.hourData(userId);
-		Map<Integer, Long> dataMap = dataList.stream().collect(Collectors.toMap(HourData::getHour, HourData::getData));
+		Map<Integer, Long> dataMap = dataList.stream().collect(Collectors.toMap(HourData::getHour, HourData::getData, (a, b) -> a + b));
 		JSONArray dataArray = new JSONArray();
 		for (int hour = 0; hour < 24; hour++) {
 			JSONObject data = new JSONObject();
@@ -46,7 +46,7 @@ public class RecordServiceImpl implements RecordService {
 	@Override
 	public String dayData(int userId, int day) {
 		List<DayData> dataList = recordDAO.dayData(userId, day);
-		Map<LocalDate, Long> dataMap = dataList.stream().collect(Collectors.toMap(DayData::getDate, DayData::getData));
+		Map<LocalDate, Long> dataMap = dataList.stream().collect(Collectors.toMap(DayData::getDate, DayData::getData, (a, b) -> a + b));
 		JSONArray dataArray = new JSONArray();
 		LocalDate end = LocalDate.now().plusDays(1);
 		LocalDate date = end.minusDays(day);
