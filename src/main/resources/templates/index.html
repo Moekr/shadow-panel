@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#C8C8C8"/>
     <title>Shadow Panel</title>
     <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
 </head>
 <body>
 <nav class="navbar navbar-default" role="navigation">
@@ -40,36 +41,38 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
         <h2>信息概览</h2>
-        <table class="table table-striped">
-            <caption>修改密码与更换端口请联系管理员</caption>
-            <tbody>
-            <tr>
-                <td>用户名/邮箱</td>
-                <td th:text="${user.username}"></td>
-                <td><button type="button" class="btn btn-xs btn-default" disabled>修改密码</button></td>
-            </tr>
-            <tr>
-                <td>个人端口</td>
-                <td th:text="${user.port}"></td>
-                <td><button type="button" class="btn btn-xs btn-default" disabled>重新分配</button></td>
-            </tr>
-            <tr>
-                <td>加密算法</td>
-                <td th:text="${properties['method']}"></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>传输协议</td>
-                <td th:text="${properties['protocol']}"></td>
-                <td>协议参数：<span th:text="${#strings.isEmpty(properties['protocol_param'])?'留空':properties['protocol_param']}"></span></td>
-            </tr>
-            <tr>
-                <td>混淆插件</td>
-                <td th:text="${properties['obfs']}"></td>
-                <td>插件参数：<span th:text="${#strings.isEmpty(properties['obfs_param'])?'留空':properties['obfs_param']}"></span></td>
-            </tr>
-            </tbody>
-        </table>
+        <p class="caution">修改密码与更换端口请联系管理员</p>
+        <div class="table-container">
+            <table class="table table-striped">
+                <tbody>
+                <tr>
+                    <td>用户名/邮箱</td>
+                    <td th:text="${user.username}"></td>
+                    <td><button type="button" class="btn btn-xs btn-default" disabled>修改密码</button></td>
+                </tr>
+                <tr>
+                    <td>个人端口</td>
+                    <td th:text="${user.port}"></td>
+                    <td><button type="button" class="btn btn-xs btn-default" disabled>重新分配</button></td>
+                </tr>
+                <tr>
+                    <td>加密算法</td>
+                    <td th:text="${properties['method']}"></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>传输协议</td>
+                    <td th:text="${properties['protocol']}"></td>
+                    <td>协议参数：<span th:text="${#strings.isEmpty(properties['protocol_param'])?'留空':properties['protocol_param']}"></span></td>
+                </tr>
+                <tr>
+                    <td>混淆插件</td>
+                    <td th:text="${properties['obfs']}"></td>
+                    <td>插件参数：<span th:text="${#strings.isEmpty(properties['obfs_param'])?'留空':properties['obfs_param']}"></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <h2>数据概览</h2>

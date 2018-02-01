@@ -1,0 +1,21 @@
+@charset "UTF-8";
+
+.caution {
+	margin: 0;
+	padding: 8px 0;
+	color: #777;
+	text-align: left;
+}
+
+.table-container {
+	white-space: pre;
+	overflow-x: auto;
+}
+
+.table-container table {
+	margin: 0;
+}
+
+.table-container .progress-bar p {
+	white-space: pre-line;
+}

@@ -6,6 +6,7 @@
 	<meta name="theme-color" content="#C8C8C8"/>
 	<title>Shadow Panel</title>
 	<link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
 </head>
 <body>
 <nav class="navbar navbar-default" role="navigation">
@@ -39,33 +40,34 @@
 		<div class="panel-body" th:utext="${properties['announcement']}"></div>
 	</div>
 	<h2>客户端下载地址列表</h2>
-	<table class="table table-striped">
-		<caption>注意：下载后请严格检查文件MD5校验码！</caption>
-		<thead>
-		<tr>
-			<th>适用平台</th>
-			<th>客户端名称</th>
-			<th>下载地址</th>
-			<th>MD5 CheckSum</th>
-		</tr>
-		</thead>
-		<tbody>
-		<th:block th:each="platform,pstate:${clients.keySet()}">
-			<tr th:each="client,cstate:${clients.get(platform)}">
-				<td th:if="${cstate.index==0}" th:rowspan="${cstate.size}" th:text="${platform}"></td>
-				<td th:text="${client.name}"></td>
-				<td><a th:href="${client.link}">下载</a></td>
-				<td th:text="${client.hash}"></td>
+	<p class="caution">注意：下载后请严格检查文件MD5校验码！</p>
+	<div class="table-container">
+		<table class="table table-striped">
+			<thead>
+			<tr>
+				<th>适用平台</th>
+				<th>客户端名称</th>
+				<th>下载地址</th>
+				<th>MD5 CheckSum</th>
 			</tr>
-		</th:block>
-		<tr th:if="${#maps.isEmpty(clients)}">
-			<td>没有记录！</td>
-		</tr>
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+			<th:block th:each="platform,pstate:${clients.keySet()}">
+				<tr th:each="client,cstate:${clients.get(platform)}">
+					<td th:if="${cstate.index==0}" th:rowspan="${cstate.size}" th:text="${platform}"></td>
+					<td th:text="${client.name}"></td>
+					<td><a th:href="${client.link}">下载</a></td>
+					<td th:text="${client.hash}"></td>
+				</tr>
+			</th:block>
+			<tr th:if="${#maps.isEmpty(clients)}">
+				<td>没有记录！</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
 </div>
 <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdn.bootcss.com/echarts/4.0.2/echarts.min.js"></script>
 </body>
 </html>

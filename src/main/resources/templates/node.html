@@ -6,6 +6,7 @@
 	<meta name="theme-color" content="#C8C8C8"/>
 	<title>Shadow Panel</title>
 	<link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
 </head>
 <body>
 <nav class="navbar navbar-default" role="navigation">
@@ -39,48 +40,49 @@
 		<div class="panel-body" th:utext="${properties['announcement']}"></div>
 	</div>
 	<h2>节点列表</h2>
-	<table class="table table-striped">
-		<caption>注意：节点总计已使用流量通常少于实际水平，因此使用量达到90%以上时请切换至其他节点。</caption>
-		<thead>
-		<tr>
-			<th>所在地区</th>
-			<th>节点编号</th>
-			<th>节点名称</th>
-			<th>节点地址</th>
-			<th>节点状态</th>
-			<th>备注信息</th>
-		</tr>
-		</thead>
-		<tbody>
-		<th:block th:each="region,rstate:${nodes.keySet()}">
-			<th:block th:each="node,nstate:${nodes.get(region)}">
-				<tr>
-					<td th:if="${nstate.index==0}" th:rowspan="${nstate.size*2}" th:text="${region}"></td>
-					<td th:text="${node.id}"></td>
-					<td th:text="${node.name}"></td>
-					<td th:text="${node.address}"></td>
-					<td><button type="button" disabled th:class="'btn btn-xs btn-'+${ToolKit.displayNodeStatus(node.status)}" th:text="${node.status.name}"></button></td>
-					<td th:text="${node.note}"></td>
-				</tr>
-				<tr th:with="usedData=${node.usedData/1024/1024/1024}">
-					<td colspan="5" th:with="usedRate=${100.0*usedData/node.totalData}">
-						<div class="progress progress-striped" style="margin: 0;">
-							<div th:class="'progress-bar progress-bar-'+${ToolKit.displayUsedRate(usedRate)}" th:style="'width: '+${usedRate}+'%'">
-								<p>已用流量：<span th:text="${usedData}"></span>G 总流量：<span th:text="${node.totalData}"></span>G</p>
+	<p class="caution">注意：节点总计已使用流量通常少于实际水平，因此使用量达到90%以上时请切换至其他节点。</p>
+	<div class="table-container">
+		<table class="table table-striped">
+			<thead>
+			<tr>
+				<th>所在地区</th>
+				<th>节点编号</th>
+				<th>节点名称</th>
+				<th>节点地址</th>
+				<th>节点状态</th>
+				<th>备注信息</th>
+			</tr>
+			</thead>
+			<tbody>
+			<th:block th:each="region,rstate:${nodes.keySet()}">
+				<th:block th:each="node,nstate:${nodes.get(region)}">
+					<tr>
+						<td th:if="${nstate.index==0}" th:rowspan="${nstate.size*2}" th:text="${region}"></td>
+						<td th:text="${node.id}"></td>
+						<td th:text="${node.name}"></td>
+						<td th:text="${node.address}"></td>
+						<td><button type="button" disabled th:class="'btn btn-xs btn-'+${ToolKit.displayNodeStatus(node.status)}" th:text="${node.status.name}"></button></td>
+						<td th:text="${node.note}"></td>
+					</tr>
+					<tr th:with="usedData=${node.usedData/1024/1024/1024}">
+						<td colspan="5" th:with="usedRate=${100.0*usedData/node.totalData}">
+							<div class="progress progress-striped" style="margin: 0;">
+								<div th:class="'progress-bar progress-bar-'+${ToolKit.displayUsedRate(usedRate)}" th:style="'width: '+${usedRate}+'%'">
+									<p>已用流量：<span th:text="${usedData}"></span>G 总流量：<span th:text="${node.totalData}"></span>G</p>
+								</div>
 							</div>
-						</div>
-					</td>
-				</tr>
+						</td>
+					</tr>
+				</th:block>
 			</th:block>
-		</th:block>
-		<tr th:if="${#maps.isEmpty(nodes)}">
-			<td>没有记录！</td>
-		</tr>
-		</tbody>
-	</table>
+			<tr th:if="${#maps.isEmpty(nodes)}">
+				<td>没有记录！</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
 </div>
 <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdn.bootcss.com/echarts/4.0.2/echarts.min.js"></script>
 </body>
 </html>
