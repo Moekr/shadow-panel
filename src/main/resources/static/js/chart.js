@@ -26,5 +26,16 @@ function paintChart(element, title, type, dataSet) {
         }]
     };
     chart.setOption(option);
+    var pre = window.onresize;
+    if (typeof pre !== 'function') {
+        window.onresize = function () {
+            chart.resize();
+        };
+    } else {
+        window.onresize = function () {
+            chart.resize();
+            pre();
+        };
+    }
 }
 

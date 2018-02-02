@@ -27,14 +27,14 @@ public class RecordServiceImpl implements RecordService {
 	}
 
 	@Override
-	public String hourData(int userId) {
-		List<HourData> dataList = recordDAO.hourData(userId);
+	public String hourData(int userId, int days) {
+		List<HourData> dataList = recordDAO.hourData(userId, days);
 		Map<Integer, Long> dataMap = dataList.stream().collect(Collectors.toMap(HourData::getHour, HourData::getData, (a, b) -> a + b));
 		JSONArray dataArray = new JSONArray();
 		for (int hour = 0; hour < 24; hour++) {
 			JSONObject data = new JSONObject();
 			try {
-				data.put("x", String.valueOf(hour));
+				data.put("x", String.valueOf(hour) + "时");
 				data.put("y", dataMap.getOrDefault(hour, 0L) / MEGA);
 			} catch (JSONException ignored) {
 			}
@@ -44,12 +44,12 @@ public class RecordServiceImpl implements RecordService {
 	}
 
 	@Override
-	public String dayData(int userId, int day) {
-		List<DayData> dataList = recordDAO.dayData(userId, day);
+	public String dayData(int userId, int days) {
+		List<DayData> dataList = recordDAO.dayData(userId, days);
 		Map<LocalDate, Long> dataMap = dataList.stream().collect(Collectors.toMap(DayData::getDate, DayData::getData, (a, b) -> a + b));
 		JSONArray dataArray = new JSONArray();
 		LocalDate end = LocalDate.now().plusDays(1);
-		LocalDate date = end.minusDays(day);
+		LocalDate date = end.minusDays(days);
 		while (!date.equals(end)) {
 			JSONObject data = new JSONObject();
 			try {

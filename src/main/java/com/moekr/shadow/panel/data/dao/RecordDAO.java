@@ -9,7 +9,7 @@ import java.util.List;
 public interface RecordDAO {
 	Record save(Record record);
 
-	List<HourData> hourData(int userId);
+	List<HourData> hourData(int userId, int days);
 
-	List<DayData> dayData(int userId, int day);
+	List<DayData> dayData(int userId, int days);
 }

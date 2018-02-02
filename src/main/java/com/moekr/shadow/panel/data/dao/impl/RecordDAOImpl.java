@@ -12,7 +12,6 @@ import org.springframework.data.convert.Jsr310Converters;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -31,15 +30,15 @@ public class RecordDAOImpl extends AbstractDAO<Record, Integer> implements Recor
 	}
 
 	@Override
-	public List<HourData> hourData(int userId) {
-		return repository.hourData(userId).stream()
-				.map(row -> new HourData((Integer) row.get("hour"), ((BigInteger) row.get("data")).longValue()))
+	public List<HourData> hourData(int userId, int days) {
+		return repository.hourData(userId, days).stream()
+				.map(row -> new HourData((Integer) row.get("hour"), ((BigDecimal) row.get("data")).longValue()))
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public List<DayData> dayData(int userId, int day) {
-		return repository.dayData(userId, day).stream()
+	public List<DayData> dayData(int userId, int days) {
+		return repository.dayData(userId, days).stream()
 				.map(row -> new DayData(DATE_TO_LOCAL_DATE_CONVERTER.convert((Date) row.get("date")), ((BigDecimal) row.get("data")).longValue()))
 				.collect(Collectors.toList());
 	}

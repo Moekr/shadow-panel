@@ -35,8 +35,7 @@ public class ViewController {
 		UserVO user = userService.retrieve(ToolKit.currentUserDetails().getUsername());
 		parameterMap.put("properties", propertyService.properties());
 		parameterMap.put("user", user);
-		parameterMap.put("weekChartData", recordService.dayData(user.getId(), 7));
-		parameterMap.put("dayChartData", recordService.hourData(user.getId()));
+		parameterMap.put("dayHourChartData", recordService.hourData(user.getId(), 1));
 		return "index";
 	}
 
@@ -53,7 +52,8 @@ public class ViewController {
 		UserVO user = userService.retrieve(ToolKit.currentUserDetails().getUsername());
 		parameterMap.put("properties", propertyService.properties());
 		parameterMap.put("user", user);
-		parameterMap.put("monthChartData", recordService.dayData(user.getId(), 30));
+		parameterMap.put("monthDayChartData", recordService.dayData(user.getId(), 30));
+		parameterMap.put("monthHourChartData", recordService.hourData(user.getId(), 30));
 		return "statistics";
 	}
 
