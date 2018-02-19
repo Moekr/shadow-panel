@@ -1,13 +1,21 @@
 package com.moekr.shadow.panel.logic.rpc;
 
-import com.moekr.shadow.panel.logic.rpc.vo.Configuration;
+import com.moekr.shadow.panel.data.entity.Port;
+import com.moekr.shadow.panel.data.entity.User;
+import com.moekr.shadow.panel.util.enums.NodeStatus;
+
+import java.util.Set;
 
 public interface NodeManager {
-	void configure(Configuration configuration);
+	void setPort(int nodeId, Set<Port> portSet);
 
-	void addInstance(int id, String address);
+	void setUser(Set<User> userSet);
 
-	Instance findInstance(int id);
+	void start(int nodeId);
 
-	void removeInstance(int id);
+	void stop(int nodeId);
+
+	void restart(int nodeId);
+
+	NodeStatus status(int nodeId);
 }

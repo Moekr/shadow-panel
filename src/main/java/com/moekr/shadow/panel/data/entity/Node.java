@@ -3,9 +3,12 @@ package com.moekr.shadow.panel.data.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode
@@ -49,4 +52,8 @@ public class Node {
 	@Basic
 	@Column(name = "revoked_at")
 	private LocalDateTime revokedAt;
+
+	@OneToMany(targetEntity = Port.class, mappedBy = "node")
+	@LazyCollection(LazyCollectionOption.FALSE)
+	private Set<Port> portSet;
 }

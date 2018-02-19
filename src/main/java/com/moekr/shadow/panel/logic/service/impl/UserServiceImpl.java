@@ -2,6 +2,7 @@ package com.moekr.shadow.panel.logic.service.impl;
 
 import com.moekr.shadow.panel.data.dao.UserDAO;
 import com.moekr.shadow.panel.data.entity.User;
+import com.moekr.shadow.panel.logic.rpc.NodeManager;
 import com.moekr.shadow.panel.logic.service.UserService;
 import com.moekr.shadow.panel.logic.vo.UserVO;
 import com.moekr.shadow.panel.util.ToolKit;
@@ -11,19 +12,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 	private final UserDAO userDAO;
-	private final NodeServiceImpl nodeService;
+	private final NodeManager nodeManager;
 
 	@Autowired
-	public UserServiceImpl(UserDAO userDAO, NodeServiceImpl nodeService) {
+	public UserServiceImpl(UserDAO userDAO, NodeManager nodeManager) {
 		this.userDAO = userDAO;
-		this.nodeService = nodeService;
+		this.nodeManager = nodeManager;
+	}
+
+	@PostConstruct
+	private void initial() {
+		nodeManager.setUser(new HashSet<>(userDAO.findAll()));
 	}
 
 	@Override
@@ -33,7 +41,7 @@ public class UserServiceImpl implements UserService {
 		BeanUtils.copyProperties(userDTO, user);
 		user.setCreatedAt(LocalDateTime.now());
 		user = userDAO.save(user);
-		nodeService.configure();
+		nodeManager.setUser(new HashSet<>(userDAO.findAll()));
 		return new UserVO(user);
 	}
 
@@ -65,7 +73,7 @@ public class UserServiceImpl implements UserService {
 		BeanUtils.copyProperties(userDTO, user);
 		user = userDAO.save(user);
 		if (configure) {
-			nodeService.configure();
+			nodeManager.setUser(new HashSet<>(userDAO.findAll()));
 		}
 		return new UserVO(user);
 	}
@@ -76,6 +84,6 @@ public class UserServiceImpl implements UserService {
 		User user = userDAO.findById(id);
 		ToolKit.assertNotNull(user);
 		userDAO.delete(user);
-		nodeService.configure();
+		nodeManager.setUser(new HashSet<>(userDAO.findAll()));
 	}
 }

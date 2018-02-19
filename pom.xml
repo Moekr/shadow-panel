@@ -4,7 +4,7 @@
 
     <groupId>com.moekr</groupId>
     <artifactId>shadow-panel</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 
     <packaging>jar</packaging>
 
@@ -58,6 +58,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.gitee.reger</groupId>
+            <artifactId>spring-boot-starter-dubbo</artifactId>
+            <version>1.0.10</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
 			<version>5.2.12.Final</version>
@@ -82,6 +88,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.moekr</groupId>
+            <artifactId>shadow-protocol</artifactId>
+            <version>0.2</version>
         </dependency>
 
         <dependency>

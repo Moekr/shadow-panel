@@ -8,6 +8,9 @@ import lombok.ToString;
 import org.springframework.beans.BeanUtils;
 
 import java.time.ZoneOffset;
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode
@@ -23,11 +26,14 @@ public class NodeVO {
 	private NodeStatus status;
 	private Long createdAt;
 	private Long revokedAt;
+	private Set<PortVO> portSet;
 
 	public NodeVO(Node node) {
-		BeanUtils.copyProperties(node, this, "createdAt", "revokedAt");
+		BeanUtils.copyProperties(node, this, "createdAt", "revokedAt", "portSet");
 		this.createdAt = node.getCreatedAt().toEpochSecond(ZoneOffset.ofHours(8));
 		this.revokedAt = node.getRevokedAt() == null ? null : node.getRevokedAt().toEpochSecond(ZoneOffset.ofHours(8));
+		this.portSet = node.getPortSet() == null ? Collections.emptySet() : node.getPortSet().stream().map(PortVO::new).collect(Collectors.toSet());
+		this.status = NodeStatus.OFFLINE;
 	}
 
 	public NodeVO(Node node, NodeStatus status) {

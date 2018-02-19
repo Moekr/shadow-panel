@@ -1,8 +1,6 @@
 package com.moekr.shadow.panel.util;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.moekr.shadow.panel.logic.vo.NodeVO;
 import com.moekr.shadow.panel.util.enums.NodeStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -11,10 +9,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class ToolKit {
 	public static Map<String, Object> emptyResponseBody() {
@@ -37,28 +34,10 @@ public abstract class ToolKit {
 		return responseBody;
 	}
 
-	public static <T> List<T> iterableToList(Iterable<T> iterable) {
-		List<T> list = new ArrayList<>();
-		iterable.forEach(list::add);
-		return list;
-	}
-
-	public static <T> List<T> sort(List<T> list, Comparator<T> comparator) {
-		list.sort(comparator);
-		return list;
-	}
-
 	public static void assertNotNull(Object object) {
 		if (object == null) {
 			throw new ServiceException(ServiceException.NOT_FOUND);
 		}
-	}
-
-	public static String convertStackTrace(Throwable throwable) {
-		StringWriter stringWriter = new StringWriter();
-		PrintWriter printWriter = new PrintWriter(stringWriter);
-		throwable.printStackTrace(printWriter);
-		return stringWriter.toString();
 	}
 
 	public static HttpStatus httpStatus(HttpServletRequest request) {
@@ -80,6 +59,7 @@ public abstract class ToolKit {
 	}
 
 	public static String displayNodeStatus(NodeStatus nodeStatus) {
+		if (nodeStatus == null) return "info";
 		switch (nodeStatus) {
 			case ONLINE:
 				return "success";
@@ -101,22 +81,7 @@ public abstract class ToolKit {
 		}
 	}
 
-	private static ObjectMapper OBJECT_MAPPER;
-
-	public static <T> T parse(String json, Class<T> clazz) throws IOException {
-		initialObjectMapper();
-		return OBJECT_MAPPER.readValue(json, clazz);
-	}
-
-	public static String parse(Object object) throws JsonProcessingException {
-		initialObjectMapper();
-		return OBJECT_MAPPER.writeValueAsString(object);
-	}
-
-	private static void initialObjectMapper() {
-		if (OBJECT_MAPPER == null) {
-			OBJECT_MAPPER = new ObjectMapper();
-			OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		}
+	public static int rowSpanOf(Collection<NodeVO> nodeSet) {
+		return nodeSet.size() * 2 + nodeSet.stream().map(node -> node.getPortSet().size()).reduce((a, b) -> a + b).orElse(0);
 	}
 }

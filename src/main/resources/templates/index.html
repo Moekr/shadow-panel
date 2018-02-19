@@ -1,88 +1,91 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" th:with="ToolKit=${T(com.moekr.shadow.panel.util.ToolKit)}">
 <head>
-    <meta charset='utf-8'/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
-    <meta name="theme-color" content="#C8C8C8"/>
-    <title>Shadow Panel</title>
-    <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
+	<meta charset='utf-8'/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
+	<meta name="theme-color" content="#C8C8C8"/>
+	<title>Shadow Panel</title>
+	<link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
 </head>
 <body>
 <nav class="navbar navbar-default" role="navigation">
-    <div class="container container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="./">Shadow Panel</a>
-        </div>
-        <div class="collapse navbar-collapse" id="header">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="./">概览</a></li>
-                <li><a href="./node.html">节点</a></li>
-                <li><a href="./statistics.html">统计</a></li>
-                <li><a href="./client.html">客户端</a></li>
-            </ul>
-            <div>
-                <p class="navbar-text navbar-right">当前用户：<span th:text="${user.username}"></span></p>
-            </div>
-        </div>
-    </div>
+	<div class="container container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="./">Shadow Panel</a>
+		</div>
+		<div class="collapse navbar-collapse" id="header">
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="./">节点</a></li>
+				<li><a href="./statistics.html">统计</a></li>
+				<li><a href="./client.html">客户端</a></li>
+			</ul>
+			<div>
+				<p class="navbar-text navbar-right">当前用户：<span th:text="${user.username}"></span>丨协议端口：<span th:text="${user.port}"></span></p>
+			</div>
+		</div>
+	</div>
 </nav>
 <div class="container">
-    <div class="panel panel-info" th:if="${not#strings.isEmpty(properties['announcement'])}">
-        <div class="panel-heading">
-            <h3 class="panel-title">公告</h3>
-        </div>
-        <div class="panel-body" th:utext="${properties['announcement']}"></div>
-    </div>
-    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-        <h2>信息概览</h2>
-        <p class="caution">修改密码与更换端口请联系管理员</p>
-        <div class="table-container">
-            <table class="table table-striped">
-                <tbody>
-                <tr>
-                    <td>用户名/邮箱</td>
-                    <td th:text="${user.username}"></td>
-                    <td><button type="button" class="btn btn-xs btn-default" disabled>修改密码</button></td>
-                </tr>
-                <tr>
-                    <td>个人端口</td>
-                    <td th:text="${user.port}"></td>
-                    <td><button type="button" class="btn btn-xs btn-default" disabled>重新分配</button></td>
-                </tr>
-                <tr>
-                    <td>加密算法</td>
-                    <td th:text="${properties['method']}"></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>传输协议</td>
-                    <td th:text="${properties['protocol']}"></td>
-                    <td>协议参数：<span th:text="${#strings.isEmpty(properties['protocol_param'])?'留空':properties['protocol_param']}"></span></td>
-                </tr>
-                <tr>
-                    <td>混淆插件</td>
-                    <td th:text="${properties['obfs']}"></td>
-                    <td>插件参数：<span th:text="${#strings.isEmpty(properties['obfs_param'])?'留空':properties['obfs_param']}"></span></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        <h2>数据概览</h2>
-        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="day-hour-chart" style="height: 300px;"></div>
-    </div>
+	<div class="panel panel-info" th:if="${not#strings.isEmpty(properties['announcement'])}">
+		<div class="panel-heading">
+			<h3 class="panel-title">公告</h3>
+		</div>
+		<div class="panel-body" th:utext="${properties['announcement']}"></div>
+	</div>
+	<h2>节点列表</h2>
+	<p class="caution">注意：节点总计已使用流量通常少于实际水平，因此使用量达到90%以上时请切换至其他节点。</p>
+	<div class="table-container">
+		<table class="table table-striped">
+			<thead>
+			<tr>
+				<th>所在地区</th>
+				<th>节点编号</th>
+				<th>节点名称</th>
+				<th>节点地址</th>
+				<th>节点状态</th>
+				<th>备注信息</th>
+			</tr>
+			</thead>
+			<tbody>
+			<th:block th:each="region,rstate:${nodes.keySet()}">
+				<th:block th:each="node,nstate:${nodes.get(region)}">
+					<tr>
+						<td th:if="${nstate.index==0}" th:rowspan="${ToolKit.rowSpanOf(nodes.get(region))}" th:text="${region}"></td>
+						<td th:text="${node.id}"></td>
+						<td th:text="${node.name}"></td>
+						<td th:text="${node.address}"></td>
+						<td><button type="button" disabled th:class="'btn btn-xs btn-'+${ToolKit.displayNodeStatus(node.status)}" th:text="${node.status.name}"></button></td>
+						<td th:text="${node.note}"></td>
+					</tr>
+					<tr th:each="port,pstate:${node.portSet}">
+						<td colspan="5" th:text="'端口：['+${port.port}+']，密码：['+${port.password}+']，算法：['+${port.method}+']，协议：['+${port.protocol}+']，混淆：['+${port.obfs}+']，参数：['+${port.obfsParam}+']'"></td>
+					</tr>
+					<tr th:with="usedData=${node.usedData/1024/1024/1024}">
+						<td colspan="5" th:with="usedRate=${100.0*usedData/node.totalData}">
+							<div class="progress progress-striped" style="margin: 0;">
+								<div th:class="'progress-bar progress-bar-'+${ToolKit.displayUsedRate(usedRate)}" th:style="'width: '+${usedRate}+'%'">
+									<p>已用流量：<span th:text="${usedData}"></span>G 总流量：<span th:text="${node.totalData}"></span>G</p>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</th:block>
+			</th:block>
+			<tr th:if="${#maps.isEmpty(nodes)}">
+				<td colspan="6">没有记录！</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+	<p class="caution">客户端设置方法：服务器地址、远程端口、密码、加密方法（算法）、协议、混淆、混淆参数按照节点列表进行设置；本地端口任意，通常保持默认即可；协议参数格式为[协议端口:个人密码]，含分号不含中括号。</p>
 </div>
 <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdn.bootcss.com/echarts/4.0.2/echarts.min.js"></script>
-<script th:src="@{/js/chart.js}"></script>
-<script th:utext="'paintChart(\'day-hour-chart\',\'今日分时数据（所有节点）\',\'line\','+${dayHourChartData}+')'"></script>
 </body>
 </html>

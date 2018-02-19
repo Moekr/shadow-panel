@@ -17,12 +17,10 @@ import java.util.stream.Collectors;
 @Service
 public class PropertyServiceImpl implements PropertyService {
 	private final PropertyDAO propertyDAO;
-	private final NodeServiceImpl nodeService;
 
 	@Autowired
-	public PropertyServiceImpl(PropertyDAO propertyDAO, NodeServiceImpl nodeService) {
+	public PropertyServiceImpl(PropertyDAO propertyDAO) {
 		this.propertyDAO = propertyDAO;
-		this.nodeService = nodeService;
 	}
 
 	@Override
@@ -41,8 +39,6 @@ public class PropertyServiceImpl implements PropertyService {
 		Property property = propertyDAO.findByName(name);
 		ToolKit.assertNotNull(property);
 		BeanUtils.copyProperties(propertyDTO, property);
-		property = propertyDAO.save(property);
-		nodeService.configure();
-		return new PropertyVO(property);
+		return new PropertyVO(propertyDAO.save(property));
 	}
 }

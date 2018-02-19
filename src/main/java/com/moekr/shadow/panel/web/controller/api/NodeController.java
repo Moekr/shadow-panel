@@ -3,6 +3,7 @@ package com.moekr.shadow.panel.web.controller.api;
 import com.moekr.shadow.panel.logic.service.NodeService;
 import com.moekr.shadow.panel.util.ToolKit;
 import com.moekr.shadow.panel.web.dto.NodeDTO;
+import com.moekr.shadow.panel.web.dto.PortDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +44,21 @@ public class NodeController {
 	public Map<String, Object> delete(@PathVariable int id) {
 		nodeService.delete(id);
 		return ToolKit.emptyResponseBody();
+	}
+
+	@PostMapping("/node/{nid}/ports")
+	public Map<String, Object> createPort(@PathVariable int nid, @RequestBody @Valid PortDTO portDTO) {
+		return ToolKit.assemblyResponseBody(nodeService.createPort(nid, portDTO));
+	}
+
+	@PutMapping("/node/{nid}/port/{pid}")
+	public Map<String, Object> updatePort(@PathVariable int nid, @PathVariable int pid, @RequestBody @Valid PortDTO portDTO) {
+		return ToolKit.assemblyResponseBody(nodeService.updatePort(nid, pid, portDTO));
+	}
+
+	@DeleteMapping("/node/{nid}/port/{pid}")
+	public Map<String, Object> deletePort(@PathVariable int nid, @PathVariable int pid) {
+		return ToolKit.assemblyResponseBody(nodeService.deletePort(nid, pid));
 	}
 
 	@PostMapping("/node/{id}/start")

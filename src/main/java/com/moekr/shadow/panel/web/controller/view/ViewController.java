@@ -32,19 +32,10 @@ public class ViewController {
 
 	@GetMapping({"/", "/index.html"})
 	public String index(Map<String, Object> parameterMap) {
-		UserVO user = userService.retrieve(ToolKit.currentUserDetails().getUsername());
-		parameterMap.put("properties", propertyService.properties());
-		parameterMap.put("user", user);
-		parameterMap.put("dayHourChartData", recordService.hourData(user.getId(), 1));
-		return "index";
-	}
-
-	@GetMapping("/node.html")
-	public String node(Map<String, Object> parameterMap) {
 		parameterMap.put("properties", propertyService.properties());
 		parameterMap.put("user", userService.retrieve(ToolKit.currentUserDetails().getUsername()));
 		parameterMap.put("nodes", nodeService.retrieve().stream().collect(Collectors.groupingBy(NodeVO::getRegion)));
-		return "node";
+		return "index";
 	}
 
 	@GetMapping("/statistics.html")
@@ -52,6 +43,7 @@ public class ViewController {
 		UserVO user = userService.retrieve(ToolKit.currentUserDetails().getUsername());
 		parameterMap.put("properties", propertyService.properties());
 		parameterMap.put("user", user);
+		parameterMap.put("dayHourChartData", recordService.hourData(user.getId(), 1));
 		parameterMap.put("monthDayChartData", recordService.dayData(user.getId(), 30));
 		parameterMap.put("monthHourChartData", recordService.hourData(user.getId(), 30));
 		return "statistics";

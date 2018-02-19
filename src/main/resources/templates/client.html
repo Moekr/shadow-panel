@@ -21,13 +21,12 @@
 		</div>
 		<div class="collapse navbar-collapse" id="header">
 			<ul class="nav navbar-nav">
-				<li><a href="./">概览</a></li>
-				<li><a href="./node.html">节点</a></li>
+				<li><a href="./">节点</a></li>
 				<li><a href="./statistics.html">统计</a></li>
 				<li class="active"><a href="./client.html">客户端</a></li>
 			</ul>
 			<div>
-				<p class="navbar-text navbar-right">当前用户：<span th:text="${user.username}"></span></p>
+				<p class="navbar-text navbar-right">当前用户：<span th:text="${user.username}"></span>丨协议端口：<span th:text="${user.port}"></span></p>
 			</div>
 		</div>
 	</div>
@@ -61,7 +60,7 @@
 				</tr>
 			</th:block>
 			<tr th:if="${#maps.isEmpty(clients)}">
-				<td>没有记录！</td>
+				<td colspan="6">没有记录！</td>
 			</tr>
 			</tbody>
 		</table>

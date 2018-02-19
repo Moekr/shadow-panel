@@ -14,6 +14,12 @@ spring:
       naming:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  dubbo:
+    application:
+      name: shadow-panel
+    protocol:
+      name: dubbo
+      port: 20880
   thymeleaf:
     mode: LEGACYHTML5
 endpoints:

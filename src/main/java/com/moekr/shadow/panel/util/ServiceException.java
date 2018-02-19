@@ -10,11 +10,9 @@ public class ServiceException extends RuntimeException {
 	private static final Map<Integer, String> ERROR_MESSAGE_MAP = new HashMap<>();
 	private static final String UNKNOWN_ERROR_MESSAGE = "Unknown error";
 
-	public static final int COMMUNICATION_FAIL = -100;
-	public static final int NOT_FOUND = -200;
+	public static final int NOT_FOUND = 100;
 
 	static {
-		ERROR_MESSAGE_MAP.put(COMMUNICATION_FAIL, "Failed to communication with shadow node");
 		ERROR_MESSAGE_MAP.put(NOT_FOUND, "Not found");
 	}
 
