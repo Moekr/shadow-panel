@@ -11,9 +11,11 @@ public class ServiceException extends RuntimeException {
 	private static final String UNKNOWN_ERROR_MESSAGE = "Unknown error";
 
 	public static final int NOT_FOUND = 100;
+	public static final int FORBIDDEN = 200;
 
 	static {
 		ERROR_MESSAGE_MAP.put(NOT_FOUND, "Not found");
+		ERROR_MESSAGE_MAP.put(FORBIDDEN, "Forbidden");
 	}
 
 	private int error;

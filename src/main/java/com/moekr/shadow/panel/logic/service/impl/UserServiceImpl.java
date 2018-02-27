@@ -1,37 +1,37 @@
 package com.moekr.shadow.panel.logic.service.impl;
 
 import com.moekr.shadow.panel.data.dao.UserDAO;
+import com.moekr.shadow.panel.data.entity.Plan;
 import com.moekr.shadow.panel.data.entity.User;
+import com.moekr.shadow.panel.logic.TransactionWrapper;
 import com.moekr.shadow.panel.logic.rpc.NodeManager;
 import com.moekr.shadow.panel.logic.service.UserService;
 import com.moekr.shadow.panel.logic.vo.UserVO;
 import com.moekr.shadow.panel.util.ToolKit;
 import com.moekr.shadow.panel.web.dto.UserDTO;
+import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@CommonsLog
 @Service
 public class UserServiceImpl implements UserService {
 	private final UserDAO userDAO;
 	private final NodeManager nodeManager;
+	private final TransactionWrapper transactionWrapper;
 
 	@Autowired
-	public UserServiceImpl(UserDAO userDAO, NodeManager nodeManager) {
+	public UserServiceImpl(UserDAO userDAO, NodeManager nodeManager, TransactionWrapper transactionWrapper) {
 		this.userDAO = userDAO;
 		this.nodeManager = nodeManager;
-	}
-
-	@PostConstruct
-	private void initial() {
-		nodeManager.setUser(new HashSet<>(userDAO.findAll()));
+		this.transactionWrapper = transactionWrapper;
 	}
 
 	@Override
@@ -39,10 +39,9 @@ public class UserServiceImpl implements UserService {
 	public UserVO create(UserDTO userDTO) {
 		User user = new User();
 		BeanUtils.copyProperties(userDTO, user);
+		user.setBalance(0.0);
 		user.setCreatedAt(LocalDateTime.now());
-		user = userDAO.save(user);
-		nodeManager.setUser(new HashSet<>(userDAO.findAll()));
-		return new UserVO(user);
+		return new UserVO(userDAO.save(user));
 	}
 
 	@Override
@@ -73,7 +72,7 @@ public class UserServiceImpl implements UserService {
 		BeanUtils.copyProperties(userDTO, user);
 		user = userDAO.save(user);
 		if (configure) {
-			nodeManager.setUser(new HashSet<>(userDAO.findAll()));
+			nodeManager.updateAvailableUser();
 		}
 		return new UserVO(user);
 	}
@@ -84,6 +83,25 @@ public class UserServiceImpl implements UserService {
 		User user = userDAO.findById(id);
 		ToolKit.assertNotNull(user);
 		userDAO.delete(user);
-		nodeManager.setUser(new HashSet<>(userDAO.findAll()));
+		nodeManager.updateAvailableUser();
+	}
+
+	@Scheduled(cron = "0 0 3 * * *")
+	protected void updateBalance() {
+		try {
+			transactionWrapper.wrap(() -> {
+				List<User> userList = userDAO.findAll();
+				for (User user : userList) {
+					if (user.getBalance() <= 0) continue;
+					Plan plan = user.getPlan();
+					if (plan == null) continue;
+					user.setBalance(user.getBalance() - plan.getPrice());
+				}
+				userDAO.save(userList);
+			});
+			nodeManager.updateAvailableUser();
+		} catch (Exception e) {
+			log.error("Failed to update user balance [" + e.getClass().getName() + "]: " + e.getMessage());
+		}
 	}
 }

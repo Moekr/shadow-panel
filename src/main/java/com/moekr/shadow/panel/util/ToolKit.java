@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class ToolKit {
+	public static final String VERSION = "0.2.1";
+
 	public static Map<String, Object> emptyResponseBody() {
 		Map<String, Object> responseBody = new HashMap<>();
 		responseBody.put("err", 0);
@@ -35,8 +37,20 @@ public abstract class ToolKit {
 	}
 
 	public static void assertNotNull(Object object) {
-		if (object == null) {
-			throw new ServiceException(ServiceException.NOT_FOUND);
+		assertTrue(object != null, ServiceException.NOT_FOUND);
+	}
+
+	public static void assertTrue(boolean condition, int code) {
+		assertTrue(condition, code, null);
+	}
+
+	public static void assertTrue(boolean condition, int code, String message) {
+		if (!condition) {
+			if (message == null) {
+				throw new ServiceException(code);
+			} else {
+				throw new ServiceException(code, message);
+			}
 		}
 	}
 

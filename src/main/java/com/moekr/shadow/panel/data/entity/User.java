@@ -8,7 +8,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "plan")
 @ToString
 @Entity
 @Table(name = "ENTITY__USER", indexes = {@Index(columnList = "username"), @Index(columnList = "port")})
@@ -31,10 +31,22 @@ public class User {
 	private Integer port;
 
 	@Basic
+	@Column(name = "balance")
+	private Double balance;
+
+	@Basic
+	@Column(name = "plan_changed_at")
+	private LocalDateTime planChangedAt;
+
+	@Basic
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
 
 	@Basic
 	@Column(name = "revoked_at")
 	private LocalDateTime revokedAt;
+
+	@ManyToOne(targetEntity = Plan.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "plan_id", referencedColumnName = "id")
+	private Plan plan;
 }

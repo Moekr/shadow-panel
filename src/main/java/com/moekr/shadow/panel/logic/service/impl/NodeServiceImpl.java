@@ -4,6 +4,7 @@ import com.moekr.shadow.panel.data.dao.NodeDAO;
 import com.moekr.shadow.panel.data.dao.PortDAO;
 import com.moekr.shadow.panel.data.entity.Node;
 import com.moekr.shadow.panel.data.entity.Port;
+import com.moekr.shadow.panel.logic.TransactionWrapper;
 import com.moekr.shadow.panel.logic.rpc.NodeManager;
 import com.moekr.shadow.panel.logic.service.NodeService;
 import com.moekr.shadow.panel.logic.vo.NodeVO;
@@ -11,6 +12,7 @@ import com.moekr.shadow.panel.logic.vo.PortVO;
 import com.moekr.shadow.panel.util.ToolKit;
 import com.moekr.shadow.panel.web.dto.NodeDTO;
 import com.moekr.shadow.panel.web.dto.PortDTO;
+import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,22 +26,30 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@CommonsLog
 @Service
 public class NodeServiceImpl implements NodeService {
 	private final NodeDAO nodeDAO;
 	private final PortDAO portDAO;
 	private final NodeManager nodeManager;
+	private final TransactionWrapper transactionWrapper;
 
 	@Autowired
-	public NodeServiceImpl(NodeDAO nodeDAO, PortDAO portDAO, NodeManager nodeManager) {
+	public NodeServiceImpl(NodeDAO nodeDAO, PortDAO portDAO, NodeManager nodeManager, TransactionWrapper transactionWrapper) {
 		this.nodeDAO = nodeDAO;
 		this.portDAO = portDAO;
 		this.nodeManager = nodeManager;
+		this.transactionWrapper = transactionWrapper;
 	}
 
 	@PostConstruct
 	private void initial() {
-		nodeDAO.findAll().forEach(node -> nodeManager.setPort(node.getId(), node.getPortSet()));
+		try {
+			transactionWrapper.wrap(() -> nodeDAO.findAll().forEach(node -> nodeManager.setPort(node.getId(), node.getPortSet())));
+			nodeManager.updateAvailableUser();
+		} catch (Exception e) {
+			log.error("Failed to initial port list to node manager [" + e.getClass().getName() + "]: " + e.getMessage());
+		}
 	}
 
 	@Override

@@ -13,14 +13,22 @@ import java.util.stream.Collectors;
 
 @Repository
 public class NodeDAOImpl extends AbstractDAO<Node, Integer> implements NodeDAO {
+	private final NodeRepository repository;
+
 	@Autowired
 	public NodeDAOImpl(NodeRepository repository) {
 		super(repository);
+		this.repository = repository;
 	}
 
 	@Override
 	public List<Node> findAll() {
 		return super.findAll().stream().filter(node -> node.getRevokedAt() == null).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<Node> findAllById(Iterable<Integer> ids) {
+		return repository.findAll(ids).stream().filter(node -> node.getRevokedAt() == null).collect(Collectors.toList());
 	}
 
 	@Override

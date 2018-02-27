@@ -22,6 +22,11 @@ public class UserDAOImpl extends AbstractDAO<User, Integer> implements UserDAO {
 	}
 
 	@Override
+	public List<User> save(Iterable<User> iterable) {
+		return repository.save(iterable);
+	}
+
+	@Override
 	public List<User> findAll() {
 		return super.findAll().stream().filter(user -> user.getRevokedAt() == null).collect(Collectors.toList());
 	}

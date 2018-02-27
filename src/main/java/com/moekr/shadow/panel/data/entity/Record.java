@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"user", "node"})
 @Entity
 @Table(name = "ENTITY__RECORD", indexes = @Index(columnList = "date"))
 public class Record {

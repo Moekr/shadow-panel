@@ -17,9 +17,11 @@ import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service(version = RpcService.VERSION)
 @Component
@@ -30,7 +32,6 @@ public class RpcServiceImpl implements RpcService, NodeManager {
 	private final RecordDAO recordDAO;
 	private final TransactionWrapper transactionWrapper;
 
-	private final Set<VirtualServer> virtualServers = new HashSet<>();
 	private final Map<Integer, ManagedNode> managedNodeMap = new HashMap<>();
 
 	@Autowired
@@ -54,12 +55,12 @@ public class RpcServiceImpl implements RpcService, NodeManager {
 		Configuration configuration = new Configuration();
 		configuration.setAction(action(nodeId, statistic.isRunning()));
 		configuration.setServers(node.servers);
-		configuration.setVirtualServers(virtualServers);
+		configuration.setVirtualServers(node.virtualServers);
 		return configuration;
 	}
 
 	@Scheduled(cron = "0 * * * * *")
-	private void updateStatus() {
+	protected void updateStatus() {
 		for (ManagedNode node : managedNodeMap.values()) {
 			boolean history = node.statusDeque.pollFirst();
 			node.statusDeque.add(node.statusBuffer);
@@ -75,7 +76,7 @@ public class RpcServiceImpl implements RpcService, NodeManager {
 	}
 
 	@Scheduled(cron = "0 0 * * * *")
-	private void saveRecord() {
+	protected void saveRecord() {
 		try {
 			transactionWrapper.wrap(() -> {
 				LocalDateTime time = LocalDateTime.now().minusHours(1);
@@ -152,14 +153,22 @@ public class RpcServiceImpl implements RpcService, NodeManager {
 	}
 
 	@Override
-	public void setUser(Set<User> userSet) {
-		virtualServers.clear();
-		userSet.stream().map(user -> {
-			VirtualServer virtualServer = new VirtualServer();
-			virtualServer.setPort(user.getPort());
-			virtualServer.setPassword(user.getPassword());
-			return virtualServer;
-		}).forEach(virtualServers::add);
+	@Transactional
+	public void updateAvailableUser() {
+		List<User> userList = userDAO.findAll().stream().filter(user -> user.getBalance() > 0).collect(Collectors.toList());
+		for (Map.Entry<Integer, ManagedNode> entry : managedNodeMap.entrySet()) {
+			Node node = nodeDAO.findById(entry.getKey());
+			ManagedNode managedNode = entry.getValue();
+			managedNode.virtualServers.clear();
+			userList.stream()
+					.filter(user -> user.getPlan().getNodeSet().contains(node))
+					.forEach(user -> {
+						VirtualServer virtualServer = new VirtualServer();
+						virtualServer.setPort(user.getPort());
+						virtualServer.setPassword(user.getPassword());
+						managedNode.virtualServers.add(virtualServer);
+					});
+		}
 	}
 
 	@Override
@@ -202,6 +211,7 @@ public class RpcServiceImpl implements RpcService, NodeManager {
 
 	private class ManagedNode {
 		final Set<Server> servers = new HashSet<>();
+		final Set<VirtualServer> virtualServers = new HashSet<>();
 		final Deque<Boolean> statusDeque = new LinkedList<>();
 		final Map<Integer, Long> trafficMap = new HashMap<>();
 		Action action = Action.NONE;

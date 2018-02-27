@@ -9,6 +9,8 @@ public interface NodeDAO {
 
 	List<Node> findAll();
 
+	List<Node> findAllById(Iterable<Integer> ids);
+
 	Node findById(Integer id);
 
 	void delete(Node node);

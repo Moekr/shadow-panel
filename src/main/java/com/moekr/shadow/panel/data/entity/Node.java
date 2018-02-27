@@ -8,10 +8,11 @@ import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"portSet", "planSet"})
 @ToString
 @Entity
 @Table(name = "ENTITY__NODE")
@@ -54,6 +55,10 @@ public class Node {
 	private LocalDateTime revokedAt;
 
 	@OneToMany(targetEntity = Port.class, mappedBy = "node")
-	@LazyCollection(LazyCollectionOption.FALSE)
-	private Set<Port> portSet;
+	@LazyCollection(LazyCollectionOption.EXTRA)
+	private Set<Port> portSet = new HashSet<>();
+
+	@ManyToMany(targetEntity = Plan.class, mappedBy = "nodeSet")
+	@LazyCollection(LazyCollectionOption.EXTRA)
+	private Set<Plan> planSet = new HashSet<>();
 }
