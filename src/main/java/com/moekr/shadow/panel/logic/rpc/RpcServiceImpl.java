@@ -8,6 +8,7 @@ import com.moekr.shadow.panel.data.entity.Node;
 import com.moekr.shadow.panel.data.entity.Port;
 import com.moekr.shadow.panel.data.entity.Record;
 import com.moekr.shadow.panel.data.entity.User;
+import com.moekr.shadow.panel.logic.TransactionWrapper;
 import com.moekr.shadow.panel.util.ToolKit;
 import com.moekr.shadow.panel.util.enums.NodeStatus;
 import com.moekr.shadow.rpc.RpcService;
@@ -16,10 +17,6 @@ import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -31,17 +28,17 @@ public class RpcServiceImpl implements RpcService, NodeManager {
 	private final UserDAO userDAO;
 	private final NodeDAO nodeDAO;
 	private final RecordDAO recordDAO;
-	private final PlatformTransactionManager transactionManager;
+	private final TransactionWrapper transactionWrapper;
 
 	private final Set<VirtualServer> virtualServers = new HashSet<>();
 	private final Map<Integer, ManagedNode> managedNodeMap = new HashMap<>();
 
 	@Autowired
-	public RpcServiceImpl(UserDAO userDAO, NodeDAO nodeDAO, RecordDAO recordDAO, PlatformTransactionManager transactionManager) {
+	public RpcServiceImpl(UserDAO userDAO, NodeDAO nodeDAO, RecordDAO recordDAO, TransactionWrapper transactionWrapper) {
 		this.userDAO = userDAO;
 		this.nodeDAO = nodeDAO;
 		this.recordDAO = recordDAO;
-		this.transactionManager = transactionManager;
+		this.transactionWrapper = transactionWrapper;
 	}
 
 	@Override
@@ -79,35 +76,32 @@ public class RpcServiceImpl implements RpcService, NodeManager {
 
 	@Scheduled(cron = "0 0 * * * *")
 	private void saveRecord() {
-		DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
-		transactionDefinition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
-		TransactionStatus transactionStatus = transactionManager.getTransaction(transactionDefinition);
-		LocalDateTime time = LocalDateTime.now().minusHours(1);
 		try {
-			for (Map.Entry<Integer, ManagedNode> nodeEntry : managedNodeMap.entrySet()) {
-				Node node = nodeDAO.findById(nodeEntry.getKey());
-				if (node == null) continue;
-				long totalTraffic = 0;
-				for (Map.Entry<Integer, Long> userEntry : nodeEntry.getValue().trafficMap.entrySet()) {
-					if (userEntry.getValue() <= 0) continue;
-					User user = userDAO.findByPort(userEntry.getKey());
-					if (user == null) continue;
-					Record record = new Record();
-					record.setDate(time.toLocalDate());
-					record.setHour(time.getHour());
-					record.setNode(node);
-					record.setUser(user);
-					record.setData(userEntry.getValue());
-					recordDAO.save(record);
-					totalTraffic = totalTraffic + userEntry.getValue();
+			transactionWrapper.wrap(() -> {
+				LocalDateTime time = LocalDateTime.now().minusHours(1);
+				for (Map.Entry<Integer, ManagedNode> nodeEntry : managedNodeMap.entrySet()) {
+					Node node = nodeDAO.findById(nodeEntry.getKey());
+					if (node == null) continue;
+					long totalTraffic = 0;
+					for (Map.Entry<Integer, Long> userEntry : nodeEntry.getValue().trafficMap.entrySet()) {
+						if (userEntry.getValue() <= 0) continue;
+						User user = userDAO.findByPort(userEntry.getKey());
+						if (user == null) continue;
+						Record record = new Record();
+						record.setDate(time.toLocalDate());
+						record.setHour(time.getHour());
+						record.setNode(node);
+						record.setUser(user);
+						record.setData(userEntry.getValue());
+						recordDAO.save(record);
+						totalTraffic = totalTraffic + userEntry.getValue();
+					}
+					node.setUsedData(node.getUsedData() + totalTraffic);
+					nodeDAO.save(node);
 				}
-				node.setUsedData(node.getUsedData() + totalTraffic);
-				nodeDAO.save(node);
-			}
-			transactionManager.commit(transactionStatus);
-		} catch (Throwable e) {
+			});
+		} catch (Exception e) {
 			log.error("Failed to save statistic data [" + e.getClass().getName() + "]: " + e.getMessage());
-			transactionManager.rollback(transactionStatus);
 		} finally {
 			managedNodeMap.values().forEach(node -> node.trafficMap.clear());
 		}
