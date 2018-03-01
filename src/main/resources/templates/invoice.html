@@ -4,7 +4,7 @@
 	<meta charset='utf-8'/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
 	<meta name="theme-color" content="#C8C8C8"/>
-	<title>客户端 | Shadow Panel</title>
+	<title>账单 | Shadow Panel</title>
 	<link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
 	<link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
 </head>
@@ -24,8 +24,8 @@
 				<li><a href="./">首页</a></li>
 				<li><a href="./node.html">节点</a></li>
 				<li><a href="./statistics.html">统计</a></li>
-				<li class="active"><a href="./client.html">客户端</a></li>
-				<li><a href="./invoice.html">账单</a></li>
+				<li><a href="./client.html">客户端</a></li>
+				<li class="active"><a href="./invoice.html">账单</a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li class="dropdown">
@@ -47,32 +47,39 @@
 		</div>
 		<div class="panel-body" th:utext="${properties['announcement']}"></div>
 	</div>
-	<h2>客户端下载地址列表</h2>
-	<p class="caution">注意：下载后请严格检查文件MD5校验码！</p>
-	<div class="table-container">
-		<table class="table table-striped">
-			<thead>
-			<tr>
-				<th>适用平台</th>
-				<th>客户端名称</th>
-				<th>下载地址</th>
-				<th>MD5 CheckSum</th>
-			</tr>
-			</thead>
-			<tbody>
-			<th:block th:each="platform,pstate:${clients.keySet()}">
-				<tr th:each="client,cstate:${clients.get(platform)}">
-					<td th:if="${cstate.index==0}" th:rowspan="${cstate.size}" th:text="${platform}"></td>
-					<td th:text="${client.name}"></td>
-					<td><a th:href="${client.link}">下载</a></td>
-					<td th:text="${client.hash}"></td>
+	<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+		<h2>当前账户余额</h2>
+		<p class="balance" th:text="'￥'+${user.balance}"></p>
+	</div>
+	<div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+		<h2>充值</h2>
+		<img class="payment" src="./static/payment.png">
+	</div>
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<h2>近期充值记录</h2>
+		<div class="table-container">
+			<table class="table table-striped">
+				<thead>
+				<tr>
+					<th>账单编号</th>
+					<th>充值金额</th>
+					<th>创建时间</th>
+					<th>交易单号</th>
 				</tr>
-			</th:block>
-			<tr th:if="${#maps.isEmpty(clients)}">
-				<td class="text-center" colspan="4">没有记录！</td>
-			</tr>
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+				<tr th:each="invoice,istate:${invoices}">
+					<td th:text="'#'+${invoice.id}"></td>
+					<td th:text="'￥'+${invoice.amount}"></td>
+					<td th:text="${#dates.format(new java.util.Date(invoice.createdAt*1000))}"></td>
+					<td><a target="_blank" th:text="${invoice.transaction}" th:href="'https://consumeprod.alipay.com/record/detail/simpleDetail.htm?bizInNo='+${invoice.transaction}"></a></td>
+				</tr>
+				<tr th:if="${#lists.isEmpty(invoices)}">
+					<td class="text-center" colspan="4">没有记录！</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </div>
 <footer class="footer">

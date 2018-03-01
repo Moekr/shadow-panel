@@ -28,4 +28,6 @@ public interface NodeService {
 	void stop(int id);
 
 	void restart(int id);
+
+	List<NodeVO> available(int userId);
 }

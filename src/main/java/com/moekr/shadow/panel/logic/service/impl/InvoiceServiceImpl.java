@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
@@ -51,5 +53,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 		Invoice invoice = invoiceDAO.findById(id);
 		ToolKit.assertNotNull(invoice);
 		return new InvoiceVO(invoice);
+	}
+
+	@Override
+	public List<InvoiceVO> recentInvoice(int userId) {
+		return invoiceDAO.recentInvoice(userId).stream().map(InvoiceVO::new).collect(Collectors.toList());
 	}
 }

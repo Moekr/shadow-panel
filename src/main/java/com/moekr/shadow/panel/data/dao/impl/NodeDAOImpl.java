@@ -42,4 +42,9 @@ public class NodeDAOImpl extends AbstractDAO<Node, Integer> implements NodeDAO {
 		node.setRevokedAt(LocalDateTime.now());
 		save(node);
 	}
+
+	@Override
+	public List<Node> available(Integer userId) {
+		return repository.available(userId);
+	}
 }

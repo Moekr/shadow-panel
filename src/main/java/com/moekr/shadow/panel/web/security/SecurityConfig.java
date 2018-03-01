@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	public static final String SESSION_KEY = "shadow-username";
 	public static final GrantedAuthority USER_AUTHORITY = new SimpleGrantedAuthority("USER");
 	public static final GrantedAuthority ADMIN_AUTHORITY = new SimpleGrantedAuthority("ADMIN");
 
@@ -31,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.authorizeRequests()
 				.antMatchers("/api/**").hasAuthority(ADMIN_AUTHORITY.getAuthority())
-				.anyRequest().hasAuthority(USER_AUTHORITY.getAuthority())
+				.anyRequest().permitAll()
 				.and()
 				.httpBasic()
 				.and()

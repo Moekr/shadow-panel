@@ -14,4 +14,6 @@ public interface NodeDAO {
 	Node findById(Integer id);
 
 	void delete(Node node);
+
+	List<Node> available(Integer userId);
 }

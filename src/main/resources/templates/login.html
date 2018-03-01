@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:with="StringUtils=${T(org.apache.commons.lang3.StringUtils)}">
+<head>
+	<meta charset='utf-8'/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
+	<meta name="theme-color" content="#C8C8C8"/>
+	<title>登录 | Shadow Panel</title>
+	<link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/login.css}" />
+</head>
+<body>
+<div class="container">
+	<div class="row">
+		<div class="col-md-offset-3 col-md-6">
+			<form class="form-horizontal" method="post" onsubmit="return checkInput();">
+				<span class="heading">Shadow Panel</span>
+				<div class="alert alert-danger text-center" th:if="${message}" th:text="${message}"></div>
+				<div class="form-group">
+					<input type="email" class="form-control" name="username" th:value="${StringUtils.defaultString(username)}" id="username-input" placeholder="用户名">
+					<i class="fa fa-user"></i>
+				</div>
+				<div class="form-group help">
+					<input type="password" class="form-control" name="password" id="password-input" placeholder="密  码">
+					<i class="fa fa-lock"></i>
+					<a href="#" class="fa fa-question-circle" title="忘记密码"></a>
+				</div>
+				<div class="form-group">
+					<div class="main-checkbox">
+						<input type="checkbox" name="remember" id="remember-input"/>
+						<label for="remember-input"></label>
+					</div>
+					<span class="text">记住登录</span>
+					<button type="submit" class="btn btn-default">登录</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<footer class="footer" th:with="ToolKit=${T(com.moekr.shadow.panel.util.ToolKit)}">
+	<div class="container">
+		<p class="text-center">©2017-2018 Powered by Shadow Panel v<span th:text="${ToolKit.VERSION}"></span></p>
+	</div>
+</footer>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script th:src="@{/js/login.js}"></script>
+</body>
+</html>

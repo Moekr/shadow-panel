@@ -3,10 +3,6 @@ package com.moekr.shadow.panel.util;
 import com.moekr.shadow.panel.logic.vo.NodeVO;
 import com.moekr.shadow.panel.util.enums.NodeStatus;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
@@ -64,12 +60,6 @@ public abstract class ToolKit {
 		} catch (Exception e) {
 			return HttpStatus.INTERNAL_SERVER_ERROR;
 		}
-	}
-
-	public static UserDetails currentUserDetails() {
-		SecurityContext securityContext = SecurityContextHolder.getContext();
-		Authentication authentication = securityContext.getAuthentication();
-		return (UserDetails) authentication.getPrincipal();
 	}
 
 	public static String displayNodeStatus(NodeStatus nodeStatus) {

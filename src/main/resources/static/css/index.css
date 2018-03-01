@@ -1,0 +1,40 @@
+@charset "UTF-8";
+
+.table-container {
+	margin-bottom: 50px;
+}
+
+table {
+	font-size: 20px;
+}
+
+th, td {
+	padding: 16px !important;
+}
+
+.tile {
+	height: 250px;
+	padding: auto;
+}
+
+.tile-button {
+	height: 200px;
+	width: 200px;
+	margin: 25px auto;
+	background-color: #aaa;
+	border-radius: 20px;
+	cursor: pointer;
+}
+
+.tile-button:hover {
+	background-color: #ccc;
+}
+
+.tile-button i {
+	font-size: 120px;
+	margin: 25px 36px 0;
+}
+
+.tile-button p {
+	font-size: 25px;
+}

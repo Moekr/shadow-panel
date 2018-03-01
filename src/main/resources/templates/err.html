@@ -4,14 +4,13 @@
     <meta charset='utf-8'/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
     <meta name="theme-color" content="#C8C8C8"/>
-    <title>Error | Shadow Panel</title>
+    <title>错误 | Shadow Panel</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/error.css}" />
 </head>
 <body>
 <div>
-    <h1>Oops，error occurred……</h1>
-    <p th:text="'Code: '+${error}"></p>
-    <p th:text="'Message: '+${message}"></p>
-    <p><a th:href="@{/}" th:text="Back"></a></p>
+    <h1 th:text="${error}"></h1>
+    <h2 th:text="${message}"></h2>
 </div>
 </body>
 </html>

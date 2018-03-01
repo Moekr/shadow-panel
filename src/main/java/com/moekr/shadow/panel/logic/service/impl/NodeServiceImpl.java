@@ -153,4 +153,12 @@ public class NodeServiceImpl implements NodeService {
 	public void restart(int id) {
 		nodeManager.restart(id);
 	}
+
+	@Override
+	public List<NodeVO> available(int userId) {
+		return nodeDAO.available(userId).stream()
+				.filter(node -> !node.getPortSet().isEmpty())
+				.map(node -> new NodeVO(node, nodeManager.status(node.getId())))
+				.collect(Collectors.toList());
+	}
 }
