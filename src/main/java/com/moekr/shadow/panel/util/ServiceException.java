@@ -12,10 +12,12 @@ public class ServiceException extends RuntimeException {
 
 	public static final int NOT_FOUND = 100;
 	public static final int FORBIDDEN = 200;
+	public static final int CONFLICT = 300;
 
 	static {
 		ERROR_MESSAGE_MAP.put(NOT_FOUND, "Not found");
 		ERROR_MESSAGE_MAP.put(FORBIDDEN, "Forbidden");
+		ERROR_MESSAGE_MAP.put(CONFLICT, "Conflict");
 	}
 
 	private int error;

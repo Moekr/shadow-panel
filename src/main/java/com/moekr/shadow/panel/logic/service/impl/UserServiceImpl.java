@@ -1,15 +1,20 @@
 package com.moekr.shadow.panel.logic.service.impl;
 
+import com.moekr.shadow.panel.data.dao.InvitationDAO;
 import com.moekr.shadow.panel.data.dao.UserDAO;
+import com.moekr.shadow.panel.data.entity.Invitation;
 import com.moekr.shadow.panel.data.entity.Plan;
 import com.moekr.shadow.panel.data.entity.User;
 import com.moekr.shadow.panel.logic.TransactionWrapper;
 import com.moekr.shadow.panel.logic.rpc.NodeManager;
 import com.moekr.shadow.panel.logic.service.UserService;
 import com.moekr.shadow.panel.logic.vo.UserVO;
+import com.moekr.shadow.panel.util.ServiceException;
 import com.moekr.shadow.panel.util.ToolKit;
 import com.moekr.shadow.panel.web.dto.UserDTO;
+import com.moekr.shadow.panel.web.dto.form.RegisterForm;
 import lombok.extern.apachecommons.CommonsLog;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,12 +29,14 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 	private final UserDAO userDAO;
+	private final InvitationDAO invitationDAO;
 	private final NodeManager nodeManager;
 	private final TransactionWrapper transactionWrapper;
 
 	@Autowired
-	public UserServiceImpl(UserDAO userDAO, NodeManager nodeManager, TransactionWrapper transactionWrapper) {
+	public UserServiceImpl(UserDAO userDAO, InvitationDAO invitationDAO, NodeManager nodeManager, TransactionWrapper transactionWrapper) {
 		this.userDAO = userDAO;
+		this.invitationDAO = invitationDAO;
 		this.nodeManager = nodeManager;
 		this.transactionWrapper = transactionWrapper;
 	}
@@ -38,7 +45,9 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public UserVO create(UserDTO userDTO) {
 		User user = new User();
-		BeanUtils.copyProperties(userDTO, user);
+		BeanUtils.copyProperties(userDTO, user, "password");
+		user.setPassword(DigestUtils.sha256Hex(userDTO.getPassword()));
+		user.setPort((int) (Math.random() * 900000 + 100000));
 		user.setBalance(0.0);
 		user.setCreatedAt(LocalDateTime.now());
 		return new UserVO(userDAO.save(user));
@@ -68,13 +77,9 @@ public class UserServiceImpl implements UserService {
 	public UserVO update(int id, UserDTO userDTO) {
 		User user = userDAO.findById(id);
 		ToolKit.assertNotNull(user);
-		boolean configure = !userDTO.getPassword().equals(user.getPassword()) || !userDTO.getPort().equals(user.getPort());
-		BeanUtils.copyProperties(userDTO, user);
-		user = userDAO.save(user);
-		if (configure) {
-			nodeManager.updateAvailableUser();
-		}
-		return new UserVO(user);
+		BeanUtils.copyProperties(userDTO, user, "password");
+		user.setPassword(DigestUtils.sha256Hex(userDTO.getPassword()));
+		return new UserVO(userDAO.save(user));
 	}
 
 	@Override
@@ -84,6 +89,24 @@ public class UserServiceImpl implements UserService {
 		ToolKit.assertNotNull(user);
 		userDAO.delete(user);
 		nodeManager.updateAvailableUser();
+	}
+
+	@Override
+	@Transactional
+	public void register(RegisterForm form) {
+		Invitation invitation = invitationDAO.findByCode(form.getInvitation());
+		ToolKit.assertNotNull(invitation);
+		ToolKit.assertTrue(!invitation.getUsed(), ServiceException.CONFLICT, "邀请码无效或已被使用！");
+		User user = new User();
+		BeanUtils.copyProperties(form, user, "password");
+		user.setPassword(DigestUtils.sha256Hex(form.getPassword()));
+		user.setPort((int) (Math.random() * 900000 + 100000));
+		user.setBalance(0.0);
+		user.setCreatedAt(LocalDateTime.now());
+		user = userDAO.save(user);
+		invitation.setUsed(true);
+		invitation.setUser(user);
+		invitationDAO.save(invitation);
 	}
 
 	@Scheduled(cron = "0 0 3 * * *")

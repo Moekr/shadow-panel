@@ -59,14 +59,9 @@
 				<td class="text-left" th:text="${user.username}"></td>
 			</tr>
 			<tr>
-				<th class="text-right">协议端口</th>
+				<th class="text-right">协议参数</th>
 				<td>：</td>
-				<td class="text-left" th:text="${user.port}"></td>
-			</tr>
-			<tr>
-				<th class="text-right">协议密码</th>
-				<td>：</td>
-				<td class="text-left" th:text="${user.username}"></td>
+				<td class="text-left" th:text="${user.port}+':'+${user.port}"></td>
 			</tr>
 			<tr>
 				<th class="text-right">当前套餐</th>

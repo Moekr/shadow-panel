@@ -12,6 +12,7 @@ public class ViewExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	public String handle(HttpServletRequest request, Exception exception) {
+		exception.printStackTrace();
 		if (exception instanceof ServiceException) {
 			request.setAttribute("error", ((ServiceException) exception).getError());
 		} else {

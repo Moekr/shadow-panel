@@ -165,7 +165,7 @@ public class RpcServiceImpl implements RpcService, NodeManager {
 					.forEach(user -> {
 						VirtualServer virtualServer = new VirtualServer();
 						virtualServer.setPort(user.getPort());
-						virtualServer.setPassword(user.getPassword());
+						virtualServer.setPassword(String.valueOf(user.getPort()));
 						managedNode.virtualServers.add(virtualServer);
 					});
 		}

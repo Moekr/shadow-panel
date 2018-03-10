@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.validator.constraints.Email;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -19,7 +18,4 @@ public class UserDTO {
 	@Pattern(regexp = "^[0-9a-zA-Z]{8,16}$")
 	@NotNull
 	private String password;
-	@Min(65536)
-	@NotNull
-	private Integer port;
 }
