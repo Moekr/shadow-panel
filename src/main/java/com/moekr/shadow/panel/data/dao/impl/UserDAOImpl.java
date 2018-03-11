@@ -50,6 +50,11 @@ public class UserDAOImpl extends AbstractDAO<User, Integer> implements UserDAO {
 	}
 
 	@Override
+	public User findByToken(String token) {
+		return repository.findByToken(token);
+	}
+
+	@Override
 	public void delete(User user) {
 		user.setPort(null);
 		user.setRevokedAt(LocalDateTime.now());

@@ -13,7 +13,9 @@ public interface UserService {
 
 	UserVO retrieve(int id);
 
-	UserVO retrieve(String username);
+	UserVO retrieveByUsername(String username);
+
+	UserVO retrieveByToken(String token);
 
 	UserVO update(int id, UserDTO userDTO);
 

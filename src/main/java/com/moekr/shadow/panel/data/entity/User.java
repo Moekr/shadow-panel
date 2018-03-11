@@ -35,6 +35,10 @@ public class User {
 	private Double balance;
 
 	@Basic
+	@Column(name = "token")
+	private String token;
+
+	@Basic
 	@Column(name = "plan_changed_at")
 	private LocalDateTime planChangedAt;
 

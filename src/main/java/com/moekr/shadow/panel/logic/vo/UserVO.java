@@ -16,6 +16,7 @@ public class UserVO {
 	private String username;
 	private Integer port;
 	private Double balance;
+	private String token;
 	private Long planChangedAt;
 	private Long createdAt;
 	private Long revokedAt;

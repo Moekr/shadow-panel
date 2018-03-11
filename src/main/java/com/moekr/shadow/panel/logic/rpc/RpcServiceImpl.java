@@ -155,7 +155,7 @@ public class RpcServiceImpl implements RpcService, NodeManager {
 	@Override
 	@Transactional
 	public void updateAvailableUser() {
-		List<User> userList = userDAO.findAll().stream().filter(user -> user.getBalance() >= 0).collect(Collectors.toList());
+		List<User> userList = userDAO.findAll().stream().filter(user -> user.getBalance() >= 0).filter(user -> user.getPlan() != null).collect(Collectors.toList());
 		for (Map.Entry<Integer, ManagedNode> entry : managedNodeMap.entrySet()) {
 			Node node = nodeDAO.findById(entry.getKey());
 			ManagedNode managedNode = entry.getValue();
@@ -165,7 +165,7 @@ public class RpcServiceImpl implements RpcService, NodeManager {
 					.forEach(user -> {
 						VirtualServer virtualServer = new VirtualServer();
 						virtualServer.setPort(user.getPort());
-						virtualServer.setPassword(String.valueOf(user.getPort()));
+						virtualServer.setPassword(user.getToken());
 						managedNode.virtualServers.add(virtualServer);
 					});
 		}

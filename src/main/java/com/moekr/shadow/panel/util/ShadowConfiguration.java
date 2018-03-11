@@ -1,4 +1,4 @@
-package com.moekr.shadow.panel.logic.rpc;
+package com.moekr.shadow.panel.util;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,6 +10,14 @@ import org.springframework.context.annotation.Configuration;
 @EqualsAndHashCode
 @ToString
 @Configuration
-@ConfigurationProperties("shadow.rpc")
-public class RpcConfiguration {
+@ConfigurationProperties("shadow")
+public class ShadowConfiguration {
+	private Subscribe subscribe = new Subscribe();
+
+	@Data
+	@EqualsAndHashCode
+	@ToString
+	public class Subscribe {
+		private String group = "Shadow-Panel";
+	}
 }

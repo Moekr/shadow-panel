@@ -17,5 +17,7 @@ public interface UserDAO {
 
 	User findByPort(Integer port);
 
+	User findByToken(String token);
+
 	void delete(User user);
 }

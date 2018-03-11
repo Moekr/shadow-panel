@@ -49,6 +49,7 @@ public class UserServiceImpl implements UserService {
 		user.setPassword(DigestUtils.sha256Hex(userDTO.getPassword()));
 		user.setPort((int) (Math.random() * 900000 + 100000));
 		user.setBalance(0.0);
+		user.setToken(ToolKit.randomUUID());
 		user.setCreatedAt(LocalDateTime.now());
 		return new UserVO(userDAO.save(user));
 	}
@@ -66,8 +67,15 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserVO retrieve(String username) {
+	public UserVO retrieveByUsername(String username) {
 		User user = userDAO.findByUsername(username);
+		ToolKit.assertNotNull(user);
+		return new UserVO(user);
+	}
+
+	@Override
+	public UserVO retrieveByToken(String token) {
+		User user = userDAO.findByToken(token);
 		ToolKit.assertNotNull(user);
 		return new UserVO(user);
 	}
@@ -102,6 +110,7 @@ public class UserServiceImpl implements UserService {
 		user.setPassword(DigestUtils.sha256Hex(form.getPassword()));
 		user.setPort((int) (Math.random() * 900000 + 100000));
 		user.setBalance(0.0);
+		user.setToken(ToolKit.randomUUID());
 		user.setCreatedAt(LocalDateTime.now());
 		user = userDAO.save(user);
 		invitation.setUsed(true);

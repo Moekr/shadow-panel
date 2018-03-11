@@ -36,13 +36,13 @@ public class ViewController {
 	@GetMapping({"/", "/index.html"})
 	public String index(Map<String, Object> parameterMap, HttpSession session) {
 		parameterMap.put("properties", propertyService.properties());
-		parameterMap.put("user", userService.retrieve((String) session.getAttribute(SecurityConfig.SESSION_KEY)));
+		parameterMap.put("user", userService.retrieveByUsername((String) session.getAttribute(SecurityConfig.SESSION_KEY)));
 		return "index";
 	}
 
 	@GetMapping("/node.html")
 	public String node(Map<String, Object> parameterMap, HttpSession session) {
-		UserVO user = userService.retrieve((String) session.getAttribute(SecurityConfig.SESSION_KEY));
+		UserVO user = userService.retrieveByUsername((String) session.getAttribute(SecurityConfig.SESSION_KEY));
 		parameterMap.put("properties", propertyService.properties());
 		parameterMap.put("user", user);
 		parameterMap.put("nodes", nodeService.available(user.getId()).stream().collect(Collectors.groupingBy(NodeVO::getRegion)));
@@ -51,7 +51,7 @@ public class ViewController {
 
 	@GetMapping("/statistics.html")
 	public String statistics(Map<String, Object> parameterMap, HttpSession session) {
-		UserVO user = userService.retrieve((String) session.getAttribute(SecurityConfig.SESSION_KEY));
+		UserVO user = userService.retrieveByUsername((String) session.getAttribute(SecurityConfig.SESSION_KEY));
 		parameterMap.put("properties", propertyService.properties());
 		parameterMap.put("user", user);
 		parameterMap.put("dayHourChartData", recordService.hourData(user.getId(), 1));
@@ -62,7 +62,7 @@ public class ViewController {
 
 	@GetMapping("/invoice.html")
 	public String invoice(Map<String, Object> parameterMap, HttpSession session) {
-		UserVO user = userService.retrieve((String) session.getAttribute(SecurityConfig.SESSION_KEY));
+		UserVO user = userService.retrieveByUsername((String) session.getAttribute(SecurityConfig.SESSION_KEY));
 		parameterMap.put("properties", propertyService.properties());
 		parameterMap.put("user", user);
 		parameterMap.put("invoices", invoiceService.recentInvoice(user.getId()));
@@ -72,7 +72,7 @@ public class ViewController {
 	@GetMapping("/client.html")
 	public String client(Map<String, Object> parameterMap, HttpSession session) {
 		parameterMap.put("properties", propertyService.properties());
-		parameterMap.put("user", userService.retrieve((String) session.getAttribute(SecurityConfig.SESSION_KEY)));
+		parameterMap.put("user", userService.retrieveByUsername((String) session.getAttribute(SecurityConfig.SESSION_KEY)));
 		parameterMap.put("clients", clientService.retrieve().stream().collect(Collectors.groupingBy(ClientVO::getPlatform)));
 		return "client";
 	}
