@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:with="StringUtils=${T(org.apache.commons.lang3.StringUtils)}">
+<html xmlns:th="http://www.thymeleaf.org" th:with="ToolKit=${T(com.moekr.shadow.panel.util.ToolKit)},StringUtils=${T(org.apache.commons.lang3.StringUtils)}">
 <head>
 	<meta charset='utf-8'/>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
@@ -37,7 +37,7 @@
 		</div>
 	</div>
 </div>
-<footer class="footer" th:with="ToolKit=${T(com.moekr.shadow.panel.util.ToolKit)}">
+<footer class="footer">
 	<div class="container">
 		<p class="text-center">©2017-2018 Powered by Shadow Panel v<span th:text="${ToolKit.VERSION}"></span></p>
 	</div>
