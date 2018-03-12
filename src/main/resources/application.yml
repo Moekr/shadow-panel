@@ -22,6 +22,14 @@ spring:
       port: 20880
   thymeleaf:
     mode: LEGACYHTML5
+  mail:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 endpoints:
   shutdown:
     enabled: true

@@ -5,7 +5,7 @@ import com.moekr.shadow.panel.logic.service.UserService;
 import com.moekr.shadow.panel.logic.vo.NodeVO;
 import com.moekr.shadow.panel.logic.vo.PortVO;
 import com.moekr.shadow.panel.logic.vo.UserVO;
-import com.moekr.shadow.panel.util.ShadowConfiguration;
+import com.moekr.shadow.panel.util.ShadowProperties;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -20,16 +20,16 @@ import java.util.List;
 public class SubscribeController {
 	private final UserService userService;
 	private final NodeService nodeService;
-	private final ShadowConfiguration configuration;
+	private final ShadowProperties properties;
 
 	private final Base64 base64;
 	private final Charset charset;
 
 	@Autowired
-	public SubscribeController(UserService userService, NodeService nodeService, ShadowConfiguration configuration) {
+	public SubscribeController(UserService userService, NodeService nodeService, ShadowProperties properties) {
 		this.userService = userService;
 		this.nodeService = nodeService;
-		this.configuration = configuration;
+		this.properties = properties;
 
 		this.base64 = new Base64(0, null, true);
 		this.charset = Charset.forName("UTF-8");
@@ -62,7 +62,7 @@ public class SubscribeController {
 			}
 			sb2.append("protoparam=").append(base64Encode(user.getPort() + ":" + user.getPort())).append('&');
 			sb2.append("remarks=").append(base64Encode(node.getRegion() + " - " + node.getName() + " - " + port.getPort())).append('&');
-			sb2.append("group=").append(base64Encode(configuration.getSubscribe().getGroup()));
+			sb2.append("group=").append(base64Encode(properties.getSubscribe().getGroup()));
 			sb1.append("ssr://").append(base64Encode(sb2.toString())).append('\n');
 		}
 		return sb1.toString();

@@ -11,13 +11,22 @@ import org.springframework.context.annotation.Configuration;
 @ToString
 @Configuration
 @ConfigurationProperties("shadow")
-public class ShadowConfiguration {
+public class ShadowProperties {
 	private Subscribe subscribe = new Subscribe();
+	private Mail mail = new Mail();
 
 	@Data
 	@EqualsAndHashCode
 	@ToString
 	public class Subscribe {
 		private String group = "Shadow-Panel";
+	}
+
+	@Data
+	@EqualsAndHashCode
+	@ToString
+	public class Mail {
+		private String from;
+		private String personal = "Shadow Panel";
 	}
 }

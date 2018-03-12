@@ -10,7 +10,16 @@ spring:
   dubbo:
     registry:
       address: zookeeper://localhost:2181
+  mail:
+    host: smtp.example.com
+    username: someone@example.com
+    password: password
 security:
   user:
     name: admin
     password: password
+
+shadow:
+  mail:
+    from: someone@example.com
+    personal: Shadow-Panel
