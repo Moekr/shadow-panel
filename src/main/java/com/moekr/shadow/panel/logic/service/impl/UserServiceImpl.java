@@ -12,9 +12,11 @@ import com.moekr.shadow.panel.logic.vo.UserVO;
 import com.moekr.shadow.panel.util.ServiceException;
 import com.moekr.shadow.panel.util.ToolKit;
 import com.moekr.shadow.panel.web.dto.UserDTO;
+import com.moekr.shadow.panel.web.dto.form.PasswordForm;
 import com.moekr.shadow.panel.web.dto.form.RegisterForm;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -116,6 +118,16 @@ public class UserServiceImpl implements UserService {
 		invitation.setUsed(true);
 		invitation.setUser(user);
 		invitationDAO.save(invitation);
+	}
+
+	@Override
+	@Transactional
+	public void password(PasswordForm form) {
+		User user = userDAO.findByUsername(form.getUsername());
+		ToolKit.assertNotNull(user);
+		ToolKit.assertTrue(StringUtils.equals(user.getPassword(), DigestUtils.sha256Hex(form.getOrigin())), ServiceException.FORBIDDEN, "旧密码不正确！");
+		user.setPassword(DigestUtils.sha256Hex(form.getPassword()));
+		userDAO.save(user);
 	}
 
 	@Scheduled(cron = "0 0 3 * * *")

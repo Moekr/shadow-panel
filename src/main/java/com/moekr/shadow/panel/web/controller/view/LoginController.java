@@ -3,6 +3,7 @@ package com.moekr.shadow.panel.web.controller.view;
 import com.moekr.shadow.panel.logic.service.UserService;
 import com.moekr.shadow.panel.util.ServiceException;
 import com.moekr.shadow.panel.web.dto.form.LoginForm;
+import com.moekr.shadow.panel.web.dto.form.PasswordForm;
 import com.moekr.shadow.panel.web.dto.form.RegisterForm;
 import com.moekr.shadow.panel.web.security.SecurityConfig;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -89,7 +90,7 @@ public class LoginController {
 				userService.register(form);
 			} catch (ServiceException e) {
 				hasError = true;
-				message = e.getError() + "：" + e.getMessage();
+				message = e.getMessage();
 			}
 		}
 		if (hasError) {
@@ -100,5 +101,39 @@ public class LoginController {
 		}
 		session.setAttribute(PREVIOUS_SESSION_KEY, form.getUsername());
 		return "redirect:/login.html";
+	}
+
+	@GetMapping("/password.html")
+	public String password(Model model, HttpSession session) {
+		model.addAttribute("username", session.getAttribute(SecurityConfig.SESSION_KEY));
+		return "password";
+	}
+
+	@PostMapping("/password.html")
+	public String password(@ModelAttribute @Valid PasswordForm form, Errors errors, Model model, HttpSession session) {
+		if (errors.hasErrors()) {
+			model.addAttribute("message", errors.getFieldError().getDefaultMessage());
+		} else {
+			String username = (String) session.getAttribute(SecurityConfig.SESSION_KEY);
+			model.addAttribute("username", username);
+			if (username == null) {
+				//TODO
+				model.addAttribute("success", "功能暂未开放！");
+			} else if (StringUtils.equals(username, form.getUsername())) {
+				if (StringUtils.equals(form.getPassword(), form.getConfirm())) {
+					try {
+						userService.password(form);
+						model.addAttribute("success", "操作成功！");
+					} catch (ServiceException e) {
+						model.addAttribute("message", e.getMessage());
+					}
+				} else {
+					model.addAttribute("message", "两次输入的密码不一致！");
+				}
+			} else {
+				model.addAttribute("message", "用户名与当前已登录用户不符！");
+			}
+		}
+		return "password";
 	}
 }

@@ -28,7 +28,7 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 		String uri = request.getRequestURI();
 		if (StringUtils.startsWithAny(uri, "/api/", "/resource/", "/js/", "/css/")
-				|| StringUtils.equalsAny(uri, "/favicon.ico", "/error", "/subscribe")) {
+				|| StringUtils.equalsAny(uri, "/favicon.ico", "/error", "/subscribe", "/password.html")) {
 			return true;
 		}
 		HttpSession session = request.getSession();
