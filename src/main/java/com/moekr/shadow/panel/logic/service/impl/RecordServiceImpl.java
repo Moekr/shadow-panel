@@ -129,6 +129,7 @@ public class RecordServiceImpl implements RecordService {
 					if (ue.getValue() < MEGA) continue;
 					User user = userDAO.findById(ue.getKey()).orElse(null);
 					if (user == null) continue;
+					node.setUsedData(node.getUsedData() + ue.getValue());
 					Record record = new Record();
 					record.setNode(node);
 					record.setUser(user);
@@ -137,6 +138,7 @@ public class RecordServiceImpl implements RecordService {
 					record.setData(ue.getValue());
 					recordDAO.save(record);
 				}
+				nodeDAO.save(node);
 			}
 		}
 	}
