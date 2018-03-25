@@ -1,6 +1,6 @@
 package com.moekr.shadow.panel.web.controller.error;
 
-import org.springframework.boot.autoconfigure.web.ErrorController;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
 
 @Controller

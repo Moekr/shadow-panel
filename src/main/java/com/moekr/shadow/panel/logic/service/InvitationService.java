@@ -1,15 +1,11 @@
 package com.moekr.shadow.panel.logic.service;
 
-import com.moekr.shadow.panel.logic.vo.InvitationVO;
+import com.moekr.shadow.panel.logic.vo.model.InvitationModel;
 
 import java.util.List;
 
 public interface InvitationService {
-	InvitationVO create();
+	List<InvitationModel> findAll();
 
-	List<InvitationVO> retrieve();
-
-	InvitationVO retrieve(int id);
-
-	void delete(int id);
+	void create(int planId);
 }

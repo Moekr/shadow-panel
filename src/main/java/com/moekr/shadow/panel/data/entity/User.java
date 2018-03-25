@@ -5,13 +5,14 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(exclude = "plan")
 @ToString
 @Entity
-@Table(name = "ENTITY__USER", indexes = {@Index(columnList = "username"), @Index(columnList = "port")})
+@Table(name = "ENTITY__USER", indexes = @Index(columnList = "username"))
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,28 +28,16 @@ public class User {
 	private String password;
 
 	@Basic
-	@Column(name = "port", unique = true)
-	private Integer port;
-
-	@Basic
-	@Column(name = "balance")
-	private Double balance;
-
-	@Basic
 	@Column(name = "token")
 	private String token;
-
-	@Basic
-	@Column(name = "plan_changed_at")
-	private LocalDateTime planChangedAt;
 
 	@Basic
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
 
 	@Basic
-	@Column(name = "revoked_at")
-	private LocalDateTime revokedAt;
+	@Column(name = "revoke_at")
+	private LocalDate revokeAt;
 
 	@ManyToOne(targetEntity = Plan.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "plan_id", referencedColumnName = "id")

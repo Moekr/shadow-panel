@@ -1,15 +1,7 @@
 package com.moekr.shadow.panel.data.dao;
 
 import com.moekr.shadow.panel.data.entity.Client;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
-public interface ClientDAO {
-	Client save(Client client);
-
-	List<Client> findAll();
-
-	Client findById(Integer id);
-
-	void delete(Client client);
+public interface ClientDAO extends JpaRepository<Client, Integer> {
 }

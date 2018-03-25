@@ -3,15 +3,17 @@ package com.moekr.shadow.panel.logic.service.impl;
 import com.moekr.shadow.panel.data.dao.PropertyDAO;
 import com.moekr.shadow.panel.data.entity.Property;
 import com.moekr.shadow.panel.logic.service.PropertyService;
-import com.moekr.shadow.panel.logic.vo.PropertyVO;
-import com.moekr.shadow.panel.util.ToolKit;
-import com.moekr.shadow.panel.web.dto.PropertyDTO;
-import org.springframework.beans.BeanUtils;
+import com.moekr.shadow.panel.logic.vo.model.PropertyModel;
+import com.moekr.shadow.panel.util.Asserts;
+import com.moekr.shadow.panel.util.enums.DefaultProperty;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,22 +25,30 @@ public class PropertyServiceImpl implements PropertyService {
 		this.propertyDAO = propertyDAO;
 	}
 
-	@Override
-	public List<PropertyVO> retrieve() {
-		return propertyDAO.findAll().stream().map(PropertyVO::new).collect(Collectors.toList());
+	@PostConstruct
+	private void initial() {
+		Set<Property> properties = new HashSet<>();
+		for (DefaultProperty defaultProperty : DefaultProperty.values()) {
+			Property property = propertyDAO.findById(defaultProperty.getName()).orElse(null);
+			if (property == null) {
+				property = new Property();
+				property.setName(defaultProperty.getName());
+				property.setContent(defaultProperty.getContent());
+				properties.add(property);
+			}
+		}
+		propertyDAO.saveAll(properties);
 	}
 
 	@Override
-	public PropertyVO retrieve(String name) {
-		return new PropertyVO(propertyDAO.findByName(name));
+	public List<PropertyModel> findAll() {
+		return propertyDAO.findAll().stream().map(PropertyModel::new).collect(Collectors.toList());
 	}
 
 	@Override
-	@Transactional
-	public PropertyVO update(String name, PropertyDTO propertyDTO) {
-		Property property = propertyDAO.findByName(name);
-		ToolKit.assertNotNull(property);
-		BeanUtils.copyProperties(propertyDTO, property);
-		return new PropertyVO(propertyDAO.save(property));
+	public PropertyModel findById(String id) {
+		Property property = propertyDAO.findById(id).orElse(null);
+		Asserts.isTrue(property != null, HttpStatus.NOT_FOUND.value());
+		return new PropertyModel(property);
 	}
 }

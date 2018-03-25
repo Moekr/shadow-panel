@@ -1,8 +1,9 @@
 package com.moekr.shadow.panel.web.security.impl;
 
 import com.moekr.shadow.panel.data.entity.User;
-import com.moekr.shadow.panel.web.security.SecurityConfig;
+import com.moekr.shadow.panel.web.security.WebSecurityConfiguration;
 import lombok.Data;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,20 +13,19 @@ import java.util.Set;
 
 @Data
 public class UserDetailsImpl implements UserDetails {
-
 	private String username;
 	private String password;
 	private Set<GrantedAuthority> authorities;
 
 	UserDetailsImpl(User user) {
 		BeanUtils.copyProperties(user, this);
-		this.authorities = Collections.singleton(SecurityConfig.USER_AUTHORITY);
+		this.authorities = Collections.singleton(WebSecurityConfiguration.USER_AUTHORITY);
 	}
 
 	UserDetailsImpl(String username, String password) {
 		this.username = username;
-		this.password = password;
-		this.authorities = Collections.singleton(SecurityConfig.ADMIN_AUTHORITY);
+		this.password = DigestUtils.sha256Hex(password);
+		this.authorities = Collections.singleton(WebSecurityConfiguration.ADMIN_AUTHORITY);
 	}
 
 	@Override

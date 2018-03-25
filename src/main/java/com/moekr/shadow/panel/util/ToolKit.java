@@ -1,17 +1,23 @@
 package com.moekr.shadow.panel.util;
 
-import com.moekr.shadow.panel.logic.vo.NodeVO;
-import com.moekr.shadow.panel.util.enums.NodeStatus;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public abstract class ToolKit {
-	public static final String VERSION = "0.2.1";
+	public static final String BANNER = "Shadow Panel";
+	public static final String VERSION = "0.3.0";
 
 	public static Map<String, Object> emptyResponseBody() {
 		Map<String, Object> responseBody = new HashMap<>();
@@ -33,28 +39,6 @@ public abstract class ToolKit {
 		return responseBody;
 	}
 
-	public static void assertNotNull(Object object) {
-		assertTrue(object != null, ServiceException.NOT_FOUND);
-	}
-
-	public static void assertTrue(boolean condition, int code) {
-		assertTrue(condition, code, null);
-	}
-
-	public static void assertTrue(boolean condition, int code, String message) {
-		if (!condition) {
-			if (message == null) {
-				throw new ServiceException(code);
-			} else {
-				throw new ServiceException(code, message);
-			}
-		}
-	}
-
-	public static String randomUUID() {
-		return UUID.randomUUID().toString().replace("-", "");
-	}
-
 	public static HttpStatus httpStatus(HttpServletRequest request) {
 		Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
 		if (statusCode == null) {
@@ -67,30 +51,34 @@ public abstract class ToolKit {
 		}
 	}
 
-	public static String displayNodeStatus(NodeStatus nodeStatus) {
-		if (nodeStatus == null) return "info";
-		switch (nodeStatus) {
-			case ONLINE:
-				return "success";
-			case UNSTABLE:
-				return "warning";
-			case OFFLINE:
-				return "danger";
-		}
-		return "info";
+	public static UserDetails currentUserDetails() {
+		SecurityContext context = SecurityContextHolder.getContext();
+		Authentication authentication = context.getAuthentication();
+		Object principle = authentication.getPrincipal();
+		return (UserDetails) principle;
 	}
 
-	public static String displayUsedRate(double rate) {
-		if (rate < 60) {
-			return "success";
-		} else if (rate > 85) {
-			return "danger";
-		} else {
-			return "warning";
+	public static boolean hasLogin() {
+		try {
+			return currentUserDetails() != null;
+		} catch (Exception e) {
+			return false;
 		}
 	}
 
-	public static int rowSpanOf(Collection<NodeVO> nodeSet) {
-		return nodeSet.size() * 2 + nodeSet.stream().map(node -> node.getPortSet().size()).reduce((a, b) -> a + b).orElse(0);
+	public static Date convert(LocalDateTime localDateTime) {
+		return new Date(localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond() * DateUtils.MILLIS_PER_SECOND);
+	}
+
+	public static Date convert(LocalDate localDate) {
+		return convert(localDate.atStartOfDay());
+	}
+
+	public static long timestamp(LocalDateTime localDateTime) {
+		return localDateTime.atZone(ZoneId.systemDefault()).toEpochSecond();
+	}
+
+	public static long timestamp(LocalDate localDate) {
+		return timestamp(localDate.atStartOfDay());
 	}
 }

@@ -3,16 +3,12 @@ package com.moekr.shadow.panel.data.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
-@EqualsAndHashCode(exclude = {"portSet", "planSet"})
+@EqualsAndHashCode
 @ToString
 @Entity
 @Table(name = "ENTITY__NODE")
@@ -31,6 +27,14 @@ public class Node {
 	private String name;
 
 	@Basic
+	@Column(name = "level")
+	private Integer level;
+
+	@Basic
+	@Column(name = "enable")
+	private Boolean enable;
+
+	@Basic
 	@Column(name = "address")
 	private String address;
 
@@ -47,18 +51,38 @@ public class Node {
 	private Long usedData;
 
 	@Basic
+	@Column(name = "port")
+	private Integer port;
+
+	@Basic
+	@Column(name = "password")
+	private String password;
+
+	@Basic
+	@Column(name = "method")
+	private String method;
+
+	@Basic
+	@Column(name = "protocol")
+	private String protocol;
+
+	@Basic
+	@Column(name = "obfs")
+	private String obfs;
+
+	@Basic
+	@Column(name = "server_obfs_param")
+	private String serverObfsParam;
+
+	@Basic
+	@Column(name = "client_obfs_param")
+	private String clientObfsParam;
+
+	@Basic
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
 
 	@Basic
 	@Column(name = "revoked_at")
 	private LocalDateTime revokedAt;
-
-	@OneToMany(targetEntity = Port.class, mappedBy = "node")
-	@LazyCollection(LazyCollectionOption.EXTRA)
-	private Set<Port> portSet = new HashSet<>();
-
-	@ManyToMany(targetEntity = Plan.class, mappedBy = "nodeSet")
-	@LazyCollection(LazyCollectionOption.EXTRA)
-	private Set<Plan> planSet = new HashSet<>();
 }

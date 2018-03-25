@@ -8,7 +8,7 @@
 }
 
 .table-container {
-	white-space: pre;
+	white-space: nowrap;
 	overflow-x: auto;
 }
 

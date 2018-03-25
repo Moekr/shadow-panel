@@ -31,7 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 	private UserDetails loadNormalUser(String username) {
 		User user = userDAO.findByUsername(username);
-		if (user == null || user.getRevokedAt() != null) {
+		if (user == null) {
 			throw new UsernameNotFoundException(username);
 		}
 		return new UserDetailsImpl(user);

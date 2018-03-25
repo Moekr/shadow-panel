@@ -1,28 +1,24 @@
 package com.moekr.shadow.panel.logic.service;
 
-import com.moekr.shadow.panel.logic.vo.UserVO;
-import com.moekr.shadow.panel.web.dto.UserDTO;
-import com.moekr.shadow.panel.web.dto.form.PasswordForm;
+import com.moekr.shadow.panel.logic.vo.model.UserModel;
+import com.moekr.shadow.panel.web.dto.form.ChangePasswordForm;
+import com.moekr.shadow.panel.web.dto.form.ChangeRevokeAtFrom;
 import com.moekr.shadow.panel.web.dto.form.RegisterForm;
 
 import java.util.List;
 
 public interface UserService {
-	UserVO create(UserDTO userDTO);
+	List<UserModel> findAll();
 
-	List<UserVO> retrieve();
+	UserModel findByUsername(String username);
 
-	UserVO retrieve(int id);
+	UserModel findByToken(String token);
 
-	UserVO retrieveByUsername(String username);
-
-	UserVO retrieveByToken(String token);
-
-	UserVO update(int id, UserDTO userDTO);
-
-	void delete(int id);
+	List<UserModel> available(int nodeId);
 
 	void register(RegisterForm form);
 
-	void password(PasswordForm form);
+	void changePassword(String username, ChangePasswordForm form);
+
+	void changeRevokeAt(ChangeRevokeAtFrom from);
 }

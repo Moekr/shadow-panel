@@ -7,10 +7,10 @@ import lombok.ToString;
 import javax.persistence.*;
 
 @Data
-@EqualsAndHashCode(exclude = "user")
+@EqualsAndHashCode(exclude = {"plan", "user"})
 @ToString
 @Entity
-@Table(name = "ENTITY_INVITATION")
+@Table(name = "ENTITY__INVITATION")
 public class Invitation {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +24,10 @@ public class Invitation {
 	@Basic
 	@Column(name = "used")
 	private Boolean used;
+
+	@ManyToOne(targetEntity = Plan.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "plan_id", referencedColumnName = "id")
+	private Plan plan;
 
 	@OneToOne(targetEntity = User.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", referencedColumnName = "id")

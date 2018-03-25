@@ -1,28 +1,32 @@
 package com.moekr.shadow.panel.logic.service.impl;
 
+import com.moekr.shadow.panel.data.TransactionWrapper;
+import com.moekr.shadow.panel.data.TransactionWrapper.SafeMethod;
 import com.moekr.shadow.panel.data.dao.InvitationDAO;
+import com.moekr.shadow.panel.data.dao.NodeDAO;
 import com.moekr.shadow.panel.data.dao.UserDAO;
 import com.moekr.shadow.panel.data.entity.Invitation;
-import com.moekr.shadow.panel.data.entity.Plan;
+import com.moekr.shadow.panel.data.entity.Node;
 import com.moekr.shadow.panel.data.entity.User;
-import com.moekr.shadow.panel.logic.TransactionWrapper;
-import com.moekr.shadow.panel.logic.rpc.NodeManager;
 import com.moekr.shadow.panel.logic.service.UserService;
-import com.moekr.shadow.panel.logic.vo.UserVO;
-import com.moekr.shadow.panel.util.ServiceException;
-import com.moekr.shadow.panel.util.ToolKit;
-import com.moekr.shadow.panel.web.dto.UserDTO;
-import com.moekr.shadow.panel.web.dto.form.PasswordForm;
+import com.moekr.shadow.panel.logic.vo.model.UserModel;
+import com.moekr.shadow.panel.util.Asserts;
+import com.moekr.shadow.panel.web.dto.form.ChangePasswordForm;
+import com.moekr.shadow.panel.web.dto.form.ChangeRevokeAtFrom;
 import com.moekr.shadow.panel.web.dto.form.RegisterForm;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
+import javax.annotation.PostConstruct;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,89 +35,70 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 	private final UserDAO userDAO;
+	private final NodeDAO nodeDAO;
 	private final InvitationDAO invitationDAO;
-	private final NodeManager nodeManager;
 	private final TransactionWrapper transactionWrapper;
 
 	@Autowired
-	public UserServiceImpl(UserDAO userDAO, InvitationDAO invitationDAO, NodeManager nodeManager, TransactionWrapper transactionWrapper) {
+	public UserServiceImpl(UserDAO userDAO, NodeDAO nodeDAO, InvitationDAO invitationDAO, TransactionWrapper transactionWrapper) {
 		this.userDAO = userDAO;
+		this.nodeDAO = nodeDAO;
 		this.invitationDAO = invitationDAO;
-		this.nodeManager = nodeManager;
 		this.transactionWrapper = transactionWrapper;
 	}
 
-	@Override
-	@Transactional
-	public UserVO create(UserDTO userDTO) {
-		User user = new User();
-		BeanUtils.copyProperties(userDTO, user, "password");
-		user.setPassword(DigestUtils.sha256Hex(userDTO.getPassword()));
-		user.setPort((int) (Math.random() * 900000 + 100000));
-		user.setBalance(0.0);
-		user.setToken(ToolKit.randomUUID());
-		user.setCreatedAt(LocalDateTime.now());
-		return new UserVO(userDAO.save(user));
+	@PostConstruct
+	private void initial() {
+		if (userDAO.count() == 0) {
+			transactionWrapper.wrap((SafeMethod) userDAO::initial);
+		}
 	}
 
 	@Override
-	public List<UserVO> retrieve() {
-		return userDAO.findAll().stream().map(UserVO::new).collect(Collectors.toList());
+	public List<UserModel> findAll() {
+		return userDAO.findAll().stream().map(UserModel::new).collect(Collectors.toList());
 	}
 
 	@Override
-	public UserVO retrieve(int id) {
-		User user = userDAO.findById(id);
-		ToolKit.assertNotNull(user);
-		return new UserVO(user);
-	}
-
-	@Override
-	public UserVO retrieveByUsername(String username) {
+	public UserModel findByUsername(String username) {
 		User user = userDAO.findByUsername(username);
-		ToolKit.assertNotNull(user);
-		return new UserVO(user);
+		Asserts.isTrue(user != null, HttpStatus.NOT_FOUND.value());
+		return new UserModel(user);
 	}
 
 	@Override
-	public UserVO retrieveByToken(String token) {
+	public UserModel findByToken(String token) {
 		User user = userDAO.findByToken(token);
-		ToolKit.assertNotNull(user);
-		return new UserVO(user);
+		Asserts.isTrue(user != null, HttpStatus.NOT_FOUND.value());
+		return new UserModel(user);
 	}
 
 	@Override
-	@Transactional
-	public UserVO update(int id, UserDTO userDTO) {
-		User user = userDAO.findById(id);
-		ToolKit.assertNotNull(user);
-		BeanUtils.copyProperties(userDTO, user, "password");
-		user.setPassword(DigestUtils.sha256Hex(userDTO.getPassword()));
-		return new UserVO(userDAO.save(user));
-	}
-
-	@Override
-	@Transactional
-	public void delete(int id) {
-		User user = userDAO.findById(id);
-		ToolKit.assertNotNull(user);
-		userDAO.delete(user);
-		nodeManager.updateAvailableUser();
+	public List<UserModel> available(int nodeId) {
+		Node node = nodeDAO.findById(nodeId).orElse(null);
+		Assert.notNull(node, "找不到节点");
+		return userDAO.findAll().stream()
+				.filter(u -> !u.getRevokeAt().isBefore(LocalDate.now()))
+				.filter(u -> u.getPlan().getLevel() > node.getLevel())
+				.map(UserModel::new)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	@Transactional
 	public void register(RegisterForm form) {
 		Invitation invitation = invitationDAO.findByCode(form.getInvitation());
-		ToolKit.assertNotNull(invitation);
-		ToolKit.assertTrue(!invitation.getUsed(), ServiceException.CONFLICT, "邀请码无效或已被使用！");
-		User user = new User();
+		Asserts.isTrue(invitation != null && !invitation.getUsed(), "邀请码无效或已被使用！");
+		User user = userDAO.findByUsername(form.getUsername());
+		Asserts.isTrue(user == null, "用户名已被使用！");
+		user = new User();
 		BeanUtils.copyProperties(form, user, "password");
 		user.setPassword(DigestUtils.sha256Hex(form.getPassword()));
-		user.setPort((int) (Math.random() * 900000 + 100000));
-		user.setBalance(0.0);
-		user.setToken(ToolKit.randomUUID());
-		user.setCreatedAt(LocalDateTime.now());
+		user.setToken(RandomStringUtils.randomAlphanumeric(12));
+		LocalDateTime now = LocalDateTime.now();
+		user.setCreatedAt(now);
+		user.setRevokeAt(now.toLocalDate());
+		user.setPlan(invitation.getPlan());
 		user = userDAO.save(user);
 		invitation.setUsed(true);
 		invitation.setUser(user);
@@ -122,30 +107,21 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public void password(PasswordForm form) {
-		User user = userDAO.findByUsername(form.getUsername());
-		ToolKit.assertNotNull(user);
-		ToolKit.assertTrue(StringUtils.equals(user.getPassword(), DigestUtils.sha256Hex(form.getOrigin())), ServiceException.FORBIDDEN, "旧密码不正确！");
+	public void changePassword(String username, ChangePasswordForm form) {
+		User user = userDAO.findByUsername(username);
+		Assert.notNull(user, "找不到用户");
+		Asserts.isTrue(StringUtils.equals(DigestUtils.sha256Hex(form.getOrigin()), user.getPassword()), "密码不正确！");
 		user.setPassword(DigestUtils.sha256Hex(form.getPassword()));
 		userDAO.save(user);
 	}
 
-	@Scheduled(cron = "0 0 3 * * *")
-	protected void updateBalance() {
-		try {
-			transactionWrapper.wrap(() -> {
-				List<User> userList = userDAO.findAll();
-				for (User user : userList) {
-					if (user.getBalance() <= 0) continue;
-					Plan plan = user.getPlan();
-					if (plan == null) continue;
-					user.setBalance(user.getBalance() - plan.getPrice());
-				}
-				userDAO.save(userList);
-			});
-			nodeManager.updateAvailableUser();
-		} catch (Exception e) {
-			log.error("Failed to update user balance [" + e.getClass().getName() + "]: " + e.getMessage());
-		}
+	@Override
+	@Transactional
+	public void changeRevokeAt(ChangeRevokeAtFrom from) {
+		User user = userDAO.findById(from.getId()).orElse(null);
+		Assert.notNull(user, "找不到用户");
+		LocalDate revokeAt = LocalDate.parse(from.getRevokeAt().replace('/', '-'));
+		user.setRevokeAt(revokeAt);
+		userDAO.save(user);
 	}
 }

@@ -1,38 +1,18 @@
 spring:
-  datasource:
-    tomcat:
-      log-abandoned: false
-      remove-abandoned: true
-      remove-abandoned-timeout: 60
-      min-evictable-idle-time-millis: 600000
-      time-between-eviction-runs-millis: 300000
-      max-wait: 5000
-      test-while-idle: true
   jpa:
     hibernate:
       ddl-auto: update
       naming:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-  dubbo:
-    application:
-      name: shadow-panel
-    protocol:
-      name: dubbo
-      port: 20880
-  thymeleaf:
-    mode: LEGACYHTML5
-  mail:
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-endpoints:
-  shutdown:
-    enabled: true
+server:
+  tomcat:
+    remote-ip-header: X-Forwarded-For
+    protocol-header: X-Forwarded-Proto
 management:
-  context-path: /api
-  add-application-context-header: false
+  endpoints:
+    web:
+      base-path: /api/actuator
+  endpoint:
+    shutdown:
+      enabled: true

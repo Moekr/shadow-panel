@@ -6,7 +6,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum DefaultProperty {
-	ANNOUNCEMENT("announcement", "");
+	ANNOUNCEMENT("announcement", ""),
+	GROUP("group", "Shadow-Panel");
 
 	private String name;
 	private String content;

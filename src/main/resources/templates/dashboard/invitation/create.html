@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:with="ToolKit=${T(com.moekr.shadow.panel.util.ToolKit)}">
+<head>
+    <meta charset='utf-8'/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
+    <meta name="theme-color" content="#C8C8C8"/>
+    <meta th:if="${success}" http-equiv="refresh" content="5;url=./">
+    <title>创建邀请码 | Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/input.css}" />
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/dashboard/}">Dashboard</a>
+        </div>
+        <div class="collapse navbar-collapse" id="header">
+            <ul class="nav navbar-nav">
+                <li><a th:href="@{/dashboard/}">概览</a></li>
+                <li><a th:href="@{/dashboard/user/}">用户</a></li>
+                <li><a th:href="@{/dashboard/plan/}">套餐</a></li>
+                <li class="active"><a th:href="@{/dashboard/invitation/}">邀请码</a></li>
+                <li><a th:href="@{/dashboard/node/}">节点</a></li>
+                <li><a th:href="@{/dashboard/client/}">客户端</a></li>
+                <li><a th:href="@{/dashboard/statistics/}">统计</a></li>
+                <li><a th:href="@{/dashboard/setting/}">设置</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">管理员<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a th:href="@{/logout.html}">退出登录</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-3 col-sm-6">
+            <form class="form-horizontal" data-toggle="validator" method="post" onsubmit="return checkInput();">
+                <span class="heading">创建邀请码</span>
+                <div class="alert alert-success text-center" th:if="${success}" th:text="${success}"></div>
+                <div class="alert alert-danger text-center" th:if="${error}" th:text="${error}"></div>
+                <th:block th:if="!${success}">
+                    <label class="control-label" for="plan">套餐名称</label>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="plan" th:value="${plan.name}" disabled>
+                        <i class="fa fa-globe"></i>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-default btn-input pull-left" onclick="window.location.href='./'">返回</button>
+                        <button type="submit" class="btn btn-default btn-input">确认</button>
+                    </div>
+                </th:block>
+            </form>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <div class="container">
+        <p class="text-center">©2018 Powered by <span th:text="${ToolKit.BANNER}"></span> ver <span th:text="${ToolKit.VERSION}"></span></p>
+    </div>
+</footer>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script th:src="@{/js/bundle.js}"></script>
+</body>
+</html>

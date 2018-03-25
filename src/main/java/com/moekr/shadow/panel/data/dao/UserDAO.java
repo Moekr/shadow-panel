@@ -1,23 +1,16 @@
 package com.moekr.shadow.panel.data.dao;
 
 import com.moekr.shadow.panel.data.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-
-public interface UserDAO {
-	User save(User user);
-
-	List<User> save(Iterable<User> iterable);
-
-	List<User> findAll();
-
-	User findById(Integer id);
-
+public interface UserDAO extends JpaRepository<User, Integer> {
 	User findByUsername(String username);
-
-	User findByPort(Integer port);
 
 	User findByToken(String token);
 
-	void delete(User user);
+	@Modifying
+	@Query(value = "ALTER TABLE ENTITY__USER AUTO_INCREMENT=100001", nativeQuery = true)
+	void initial();
 }

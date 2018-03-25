@@ -1,13 +1,7 @@
 package com.moekr.shadow.panel.data.dao;
 
 import com.moekr.shadow.panel.data.entity.Plan;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
-public interface PlanDAO {
-	Plan save(Plan plan);
-
-	Plan findById(Integer id);
-
-	List<Plan> findAll();
+public interface PlanDAO extends JpaRepository<Plan, Integer> {
 }

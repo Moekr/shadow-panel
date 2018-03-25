@@ -1,20 +1,21 @@
 package com.moekr.shadow.panel.logic.service;
 
-import com.moekr.shadow.panel.logic.vo.PropertyVO;
-import com.moekr.shadow.panel.web.dto.PropertyDTO;
+import com.moekr.shadow.panel.logic.vo.model.PropertyModel;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public interface PropertyService {
-	List<PropertyVO> retrieve();
+	List<PropertyModel> findAll();
 
-	PropertyVO retrieve(String name);
+	PropertyModel findById(String id);
 
-	PropertyVO update(String name, PropertyDTO propertyDTO);
+	default PropertyModel findByName(String name) {
+		return findById(name);
+	}
 
 	default Map<String, String> properties() {
-		return retrieve().stream().collect(Collectors.toMap(PropertyVO::getName, PropertyVO::getContent));
+		return findAll().stream().collect(Collectors.toMap(PropertyModel::getName, PropertyModel::getContent));
 	}
 }

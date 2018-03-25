@@ -1,33 +1,19 @@
 package com.moekr.shadow.panel.logic.service;
 
-import com.moekr.shadow.panel.logic.vo.NodeVO;
-import com.moekr.shadow.panel.web.dto.NodeDTO;
-import com.moekr.shadow.panel.web.dto.PortDTO;
+import com.moekr.shadow.panel.logic.vo.model.NodeModel;
+import com.moekr.shadow.panel.web.dto.form.CreateNodeForm;
+import com.moekr.shadow.panel.web.dto.form.NodeActionForm;
 
 import java.util.List;
 
 public interface NodeService {
-	NodeVO create(NodeDTO nodeDTO);
+	List<NodeModel> findAll();
 
-	List<NodeVO> retrieve();
+	NodeModel findById(int id);
 
-	NodeVO retrieve(int id);
+	void create(CreateNodeForm form);
 
-	NodeVO update(int id, NodeDTO nodeDTO);
+	void action(NodeActionForm form);
 
-	void delete(int id);
-
-	NodeVO createPort(int nid, PortDTO portDTO);
-
-	NodeVO updatePort(int nid, int pid, PortDTO portDTO);
-
-	NodeVO deletePort(int nid, int pid);
-
-	void start(int id);
-
-	void stop(int id);
-
-	void restart(int id);
-
-	List<NodeVO> available(int userId);
+	List<NodeModel> available(int userId);
 }

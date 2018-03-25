@@ -1,18 +1,14 @@
 package com.moekr.shadow.panel.logic.service;
 
-import com.moekr.shadow.panel.logic.vo.ClientVO;
-import com.moekr.shadow.panel.web.dto.ClientDTO;
+import com.moekr.shadow.panel.logic.vo.model.ClientModel;
+import com.moekr.shadow.panel.web.dto.form.CreateClientForm;
 
 import java.util.List;
 
 public interface ClientService {
-	ClientVO create(ClientDTO clientDTO);
+	List<ClientModel> findAll();
 
-	List<ClientVO> retrieve();
-
-	ClientVO retrieve(int id);
-
-	ClientVO update(int id, ClientDTO clientDTO);
+	void create(CreateClientForm form);
 
 	void delete(int id);
 }

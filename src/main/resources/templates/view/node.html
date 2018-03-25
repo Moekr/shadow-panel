@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:with="ToolKit=${T(com.moekr.shadow.panel.util.ToolKit)}">
+<head>
+	<meta charset='utf-8'/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
+	<meta name="theme-color" content="#C8C8C8"/>
+	<title th:text="'节点 | '+${ToolKit.BANNER}"></title>
+	<link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+	<div class="container container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" th:href="@{/}" th:text="${ToolKit.BANNER}"></a>
+		</div>
+		<div class="collapse navbar-collapse" id="header">
+			<ul class="nav navbar-nav">
+				<li><a th:href="@{/}">首页</a></li>
+				<li class="active"><a th:href="@{/node.html}">节点</a></li>
+				<li><a th:href="@{/statistics.html}">统计</a></li>
+				<li><a th:href="@{/client.html}">客户端</a></li>
+				<li><a th:href="@{/help.html}">帮助</a></li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span th:text="${user.username}"></span><span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a th:href="@{/password.html}">修改密码</a></li>
+						<li class="divider"></li>
+						<li><a th:href="@{/logout.html}">退出登录</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+<div class="container">
+	<div class="row" th:if="${not#strings.isEmpty(properties['announcement'])}">
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">公告</h3>
+			</div>
+			<div class="panel-body" th:utext="${properties['announcement']}"></div>
+		</div>
+	</div>
+	<div class="row">
+		<h2>节点列表</h2>
+		<p class="caution">注意：节点总计已使用流量通常少于实际水平，因此使用量达到90%以上时请切换至其他节点。</p>
+		<div class="table-container">
+			<table class="table table-striped">
+				<thead>
+				<tr>
+					<th>地区</th>
+					<th>编号</th>
+					<th>名称</th>
+					<th>地址</th>
+					<th>端口</th>
+					<th>密码</th>
+					<th>状态</th>
+					<th>备注</th>
+				</tr>
+				</thead>
+				<tbody>
+				<th:block th:each="region,rstate:${nodes.keySet()}">
+					<th:block th:each="node,nstate:${nodes.get(region)}">
+						<tr>
+							<td th:if="${nstate.index==0}" th:rowspan="${nstate.size*3}" th:text="${region}"></td>
+							<td th:text="${node.id}"></td>
+							<td th:text="${node.name}"></td>
+							<td th:text="${node.address}"></td>
+							<td th:text="${node.port}"></td>
+							<td th:text="${node.password}"></td>
+							<td th:switch="${node.enable}">
+								<span th:case="${true}" class="label label-success">启用</span>
+								<span th:case="${false}" class="label label-info">停用</span>
+								<span th:case="*" class="label label-default">未知</span>
+							</td>
+							<td th:text="${node.note}"></td>
+						</tr>
+						<tr>
+							<td colspan="7" th:text="'加密：['+${node.method}+']，协议：['+${node.protocol}+']，混淆：['+${node.obfs}+']，混淆参数：['+${node.clientObfsParam}+']'"></td>
+						</tr>
+						<tr th:with="usedData=${node.usedData/1024/1024/1024}">
+							<td colspan="7" th:with="usedRate=${100.0*usedData/node.totalData}">
+								<div class="progress progress-striped" style="margin: 0;">
+									<div th:class="'progress-bar progress-bar-'+${usedRate<60?'success':(usedRate>85?'danger':'warning')}" th:style="'width: '+${usedRate}+'%'">
+										<p th:text="${#numbers.formatDecimal(usedRate,1,2)}+'%'"></p>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</th:block>
+				</th:block>
+				<tr th:if="${#maps.isEmpty(nodes)}">
+					<td colspan="8" class="text-center">没有记录！</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<footer class="footer">
+	<div class="container">
+		<p class="text-center">©2017-2018 Powered by <span th:text="${ToolKit.BANNER}"></span> ver <span th:text="${ToolKit.VERSION}"></span></p>
+	</div>
+</footer>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>

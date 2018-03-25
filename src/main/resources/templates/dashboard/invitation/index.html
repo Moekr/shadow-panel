@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:with="ToolKit=${T(com.moekr.shadow.panel.util.ToolKit)}">
+<head>
+    <meta charset='utf-8'/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
+    <meta name="theme-color" content="#C8C8C8"/>
+    <title>邀请码管理 | Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" th:href="@{/dashboard/}">Dashboard</a>
+        </div>
+        <div class="collapse navbar-collapse" id="header">
+            <ul class="nav navbar-nav">
+                <li><a th:href="@{/dashboard/}">概览</a></li>
+                <li><a th:href="@{/dashboard/user/}">用户</a></li>
+                <li><a th:href="@{/dashboard/plan/}">套餐</a></li>
+                <li class="active"><a th:href="@{/dashboard/invitation/}">邀请码</a></li>
+                <li><a th:href="@{/dashboard/node/}">节点</a></li>
+                <li><a th:href="@{/dashboard/client/}">客户端</a></li>
+                <li><a th:href="@{/dashboard/statistics/}">统计</a></li>
+                <li><a th:href="@{/dashboard/setting/}">设置</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">管理员<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a th:href="@{/logout.html}">退出登录</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container">
+    <div class="row">
+        <h2>邀请码列表</h2>
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>邀请码</th>
+                    <th>套餐</th>
+                    <th>使用者</th>
+                    <th>使用时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="invitation,istate:${invitationList}">
+                    <td th:text="${invitation.id}"></td>
+                    <td th:text="${invitation.code}"></td>
+                    <td th:text="${invitation.plan}"></td>
+                    <td th:text="${invitation.used?invitation.user:'未使用'}"></td>
+                    <td th:text="${invitation.used?#dates.format(ToolKit.convert(invitation.usedAt)):'未使用'}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(invitationList)}">
+                    <td class="text-center" colspan="5">没有记录！</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<footer class="footer">
+    <div class="container">
+        <p class="text-center">©2017-2018 Powered by <span th:text="${ToolKit.BANNER}"></span> ver <span th:text="${ToolKit.VERSION}"></span></p>
+    </div>
+</footer>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>

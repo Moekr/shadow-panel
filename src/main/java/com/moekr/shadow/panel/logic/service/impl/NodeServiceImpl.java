@@ -1,164 +1,94 @@
 package com.moekr.shadow.panel.logic.service.impl;
 
 import com.moekr.shadow.panel.data.dao.NodeDAO;
-import com.moekr.shadow.panel.data.dao.PortDAO;
+import com.moekr.shadow.panel.data.dao.UserDAO;
 import com.moekr.shadow.panel.data.entity.Node;
-import com.moekr.shadow.panel.data.entity.Port;
-import com.moekr.shadow.panel.logic.TransactionWrapper;
-import com.moekr.shadow.panel.logic.rpc.NodeManager;
+import com.moekr.shadow.panel.data.entity.User;
 import com.moekr.shadow.panel.logic.service.NodeService;
-import com.moekr.shadow.panel.logic.vo.NodeVO;
-import com.moekr.shadow.panel.logic.vo.PortVO;
-import com.moekr.shadow.panel.util.ToolKit;
-import com.moekr.shadow.panel.web.dto.NodeDTO;
-import com.moekr.shadow.panel.web.dto.PortDTO;
+import com.moekr.shadow.panel.logic.vo.model.NodeModel;
+import com.moekr.shadow.panel.util.Asserts;
+import com.moekr.shadow.panel.util.ServiceException;
+import com.moekr.shadow.panel.web.dto.form.CreateNodeForm;
+import com.moekr.shadow.panel.web.dto.form.NodeActionForm;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @CommonsLog
 @Service
 public class NodeServiceImpl implements NodeService {
 	private final NodeDAO nodeDAO;
-	private final PortDAO portDAO;
-	private final NodeManager nodeManager;
-	private final TransactionWrapper transactionWrapper;
+	private final UserDAO userDAO;
 
 	@Autowired
-	public NodeServiceImpl(NodeDAO nodeDAO, PortDAO portDAO, NodeManager nodeManager, TransactionWrapper transactionWrapper) {
+	public NodeServiceImpl(NodeDAO nodeDAO, UserDAO userDAO) {
 		this.nodeDAO = nodeDAO;
-		this.portDAO = portDAO;
-		this.nodeManager = nodeManager;
-		this.transactionWrapper = transactionWrapper;
+		this.userDAO = userDAO;
 	}
 
-	@PostConstruct
-	private void initial() {
-		try {
-			transactionWrapper.wrap(() -> nodeDAO.findAll().forEach(node -> nodeManager.setPort(node.getId(), node.getPortSet())));
-			nodeManager.updateAvailableUser();
-		} catch (Exception e) {
-			log.error("Failed to initial port list to node manager [" + e.getClass().getName() + "]: " + e.getMessage());
-		}
+	@Override
+	public List<NodeModel> findAll() {
+		return nodeDAO.findAllByRevokedAtIsNull().stream().map(NodeModel::new).collect(Collectors.toList());
+	}
+
+	@Override
+	public NodeModel findById(int id) {
+		Node node = nodeDAO.findById(id).orElse(null);
+		Asserts.isTrue(node != null, "找不到目标节点！");
+		return new NodeModel(node);
 	}
 
 	@Override
 	@Transactional
-	public NodeVO create(NodeDTO nodeDTO) {
+	public void create(CreateNodeForm form) {
 		Node node = new Node();
-		BeanUtils.copyProperties(nodeDTO, node);
+		BeanUtils.copyProperties(form, node);
+		node.setEnable(false);
 		node.setCreatedAt(LocalDateTime.now());
-		node = nodeDAO.save(node);
-		nodeManager.setPort(node.getId(), Collections.emptySet());
-		return new NodeVO(node);
-	}
-
-	@Override
-	public List<NodeVO> retrieve() {
-		return nodeDAO.findAll().stream()
-				.map(node -> new NodeVO(node, nodeManager.status(node.getId())))
-				.collect(Collectors.toList());
-	}
-
-	@Override
-	public NodeVO retrieve(int id) {
-		Node node = nodeDAO.findById(id);
-		ToolKit.assertNotNull(node);
-		return new NodeVO(node, nodeManager.status(node.getId()));
+		nodeDAO.save(node);
 	}
 
 	@Override
 	@Transactional
-	public NodeVO update(int id, NodeDTO nodeDTO) {
-		Node node = nodeDAO.findById(id);
-		ToolKit.assertNotNull(node);
-		BeanUtils.copyProperties(nodeDTO, node);
-		return new NodeVO(nodeDAO.save(node), nodeManager.status(id));
+	public void action(NodeActionForm form) {
+		Node node = nodeDAO.findById(form.getId()).orElse(null);
+		Asserts.isTrue(node != null, "找不到目标节点！");
+		switch (form.getAction()) {
+			case "enable":
+				if (!node.getEnable()) {
+					node.setEnable(true);
+				}
+				break;
+			case "disable":
+				if (node.getEnable()) {
+					node.setEnable(false);
+				}
+				break;
+			case "remove":
+				node.setRevokedAt(LocalDateTime.now());
+				break;
+			default:
+				throw new ServiceException("不能识别的目标操作！");
+		}
+		nodeDAO.save(node);
 	}
 
 	@Override
-	@Transactional
-	public void delete(int id) {
-		Node node = nodeDAO.findById(id);
-		ToolKit.assertNotNull(node);
-		nodeDAO.delete(node);
-		nodeManager.setPort(id, null);
-	}
-
-	@Override
-	@Transactional
-	public NodeVO createPort(int nid, PortDTO portDTO) {
-		Node node = nodeDAO.findById(nid);
-		ToolKit.assertNotNull(node);
-		Set<Port> portSet = new HashSet<>(node.getPortSet());
-		Port port = new Port();
-		BeanUtils.copyProperties(portDTO, port);
-		port.setNode(node);
-		portSet.add(portDAO.save(port));
-		nodeManager.setPort(nid, portSet);
-		NodeVO nodeVO = new NodeVO(node, nodeManager.status(nid));
-		nodeVO.setPortSet(portSet.stream().map(PortVO::new).collect(Collectors.toSet()));
-		return nodeVO;
-	}
-
-	@Override
-	@Transactional
-	public NodeVO updatePort(int nid, int pid, PortDTO portDTO) {
-		Node node = nodeDAO.findById(nid);
-		ToolKit.assertNotNull(node);
-		Port port = node.getPortSet().stream().filter(p -> p.getId() == pid).findFirst().orElse(null);
-		ToolKit.assertNotNull(port);
-		BeanUtils.copyProperties(portDTO, port);
-		portDAO.save(port);
-		nodeManager.setPort(nid, node.getPortSet());
-		return new NodeVO(node, nodeManager.status(nid));
-	}
-
-	@Override
-	public NodeVO deletePort(int nid, int pid) {
-		Node node = nodeDAO.findById(nid);
-		ToolKit.assertNotNull(node);
-		Port port = node.getPortSet().stream().filter(p -> p.getId() == pid).findFirst().orElse(null);
-		ToolKit.assertNotNull(port);
-		Set<Port> portSet = new HashSet<>(node.getPortSet());
-		portDAO.delete(port);
-		portSet.removeIf(p -> p.getId() == pid);
-		nodeManager.setPort(nid, portSet);
-		NodeVO nodeVO = new NodeVO(node, nodeManager.status(nid));
-		nodeVO.setPortSet(portSet.stream().map(PortVO::new).collect(Collectors.toSet()));
-		return nodeVO;
-	}
-
-	@Override
-	public void start(int id) {
-		nodeManager.start(id);
-	}
-
-	@Override
-	public void stop(int id) {
-		nodeManager.stop(id);
-	}
-
-	@Override
-	public void restart(int id) {
-		nodeManager.restart(id);
-	}
-
-	@Override
-	public List<NodeVO> available(int userId) {
-		return nodeDAO.available(userId).stream()
-				.filter(node -> !node.getPortSet().isEmpty())
-				.map(node -> new NodeVO(node, nodeManager.status(node.getId())))
-				.collect(Collectors.toList());
+	public List<NodeModel> available(int userId) {
+		User user = userDAO.findById(userId).orElse(null);
+		Assert.notNull(user, "找不到用户");
+		if (user.getPlan() == null) {
+			return Collections.emptyList();
+		} else {
+			return nodeDAO.findAllByRevokedAtIsNullAndLevelLessThan(user.getPlan().getLevel()).stream().map(NodeModel::new).collect(Collectors.toList());
+		}
 	}
 }

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:with="ToolKit=${T(com.moekr.shadow.panel.util.ToolKit)}">
+<head>
+	<meta charset='utf-8'/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
+	<meta name="theme-color" content="#C8C8C8"/>
+	<title th:text="'首页 | '+${ToolKit.BANNER}"></title>
+	<link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/common.css}" />
+	<link rel="stylesheet" type="text/css" th:href="@{/css/tile.css}" />
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+	<div class="container container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" th:href="@{/}" th:text="${ToolKit.BANNER}"></a>
+		</div>
+		<div class="collapse navbar-collapse" id="header">
+			<ul class="nav navbar-nav">
+				<li class="active"><a th:href="@{/}">首页</a></li>
+				<li><a th:href="@{/node.html}">节点</a></li>
+				<li><a th:href="@{/statistics.html}">统计</a></li>
+				<li><a th:href="@{/client.html}">客户端</a></li>
+				<li><a th:href="@{/help.html}">帮助</a></li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><span th:text="${user.username}"></span><span class="caret"></span></a>
+					<ul class="dropdown-menu">
+						<li><a th:href="@{/password.html}">修改密码</a></li>
+						<li class="divider"></li>
+						<li><a th:href="@{/logout.html}">退出登录</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+<div class="container">
+	<div class="row" th:if="${not#strings.isEmpty(properties['announcement'])}">
+		<div class="panel panel-info">
+			<div class="panel-heading">
+				<h3 class="panel-title">公告</h3>
+			</div>
+			<div class="panel-body" th:utext="${properties['announcement']}"></div>
+		</div>
+	</div>
+	<div class="row col-md-6">
+		<h2>个人信息</h2>
+		<div class="table-container">
+			<table class="table table-striped">
+				<tbody>
+				<tr>
+					<th>用户ID</th>
+					<td th:text="${user.id}"></td>
+				</tr>
+				<tr>
+					<th>用户名</th>
+					<td th:text="${user.username}"></td>
+				</tr>
+				<tr>
+					<th>个人秘钥</th>
+					<td th:text="${user.token}"></td>
+				</tr>
+				<tr>
+					<th>注册时间</th>
+					<td th:text="${#dates.format(ToolKit.convert(user.createdAt))}"></td>
+				</tr>
+				<tr>
+					<th>当前套餐</th>
+					<td th:text="${user.plan}"></td>
+				</tr>
+				<tr>
+					<th>到期时间</th>
+					<td th:text="${#dates.format(ToolKit.convert(user.revokeAt.plusDays(1)))}"></td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="row col-md-12">
+		<div class="col-md-3 col-sm-6 col-xs-12 tile">
+			<div class="tile-button" onclick="window.location='node.html';">
+				<i class="fa fa-server"></i>
+				<p class="text-center">节点列表</p>
+			</div>
+		</div>
+		<div class="col-md-3 col-sm-6 col-xs-12 tile">
+			<div class="tile-button" onclick="window.location='statistics.html';">
+				<i class="fa fa-bar-chart"></i>
+				<p class="text-center">统计数据</p>
+			</div>
+		</div>
+		<div class="col-md-3 col-sm-6 col-xs-12 tile">
+			<div class="tile-button" onclick="window.location='client.html';">
+				<i class="fa fa-laptop"></i>
+				<p class="text-center">客户端下载</p>
+			</div>
+		</div>
+		<div class="col-md-3 col-sm-6 col-xs-12 tile">
+			<div class="tile-button" onclick="window.location='./help.html';">
+				<i class="fa fa-question-circle-o"></i>
+				<p class="text-center">FAQ</p>
+			</div>
+		</div>
+	</div>
+</div>
+<footer class="footer">
+	<div class="container">
+		<p class="text-center">©2017-2018 Powered by <span th:text="${ToolKit.BANNER}"></span> ver <span th:text="${ToolKit.VERSION}"></span></p>
+	</div>
+</footer>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>
