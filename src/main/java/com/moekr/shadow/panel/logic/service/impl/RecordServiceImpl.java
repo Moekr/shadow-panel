@@ -140,6 +140,7 @@ public class RecordServiceImpl implements RecordService {
 				}
 				nodeDAO.save(node);
 			}
+			buffer.clear();
 		}
 	}
 }
