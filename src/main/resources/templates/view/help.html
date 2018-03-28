@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:with="ToolKit=${T(com.moekr.shadow.panel.util.ToolKit)}">
+<html xmlns:th="http://www.thymeleaf.org" th:with="ToolKit=${T(com.moekr.shadow.panel.util.ToolKit)},LocalDate=${T(java.time.LocalDate)}">
 <head>
     <meta charset='utf-8'/>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1"/>
@@ -43,7 +43,7 @@
     </div>
 </nav>
 <div class="container">
-    <div class="row" th:if="${not#strings.isEmpty(properties['announcement'])}">
+    <div class="row col-md-12" th:if="${not#strings.isEmpty(properties['announcement'])}">
         <div class="panel panel-info">
             <div class="panel-heading">
                 <h3 class="panel-title">公告</h3>
@@ -51,9 +51,15 @@
             <div class="panel-body" th:utext="${properties['announcement']}"></div>
         </div>
     </div>
+    <div class="row col-md-12" th:if="${user.revokeAt.isEqual(LocalDate.now())}">
+        <div class="alert alert-warning text-center">注意，您的账户即将到期！</div>
+    </div>
+    <div class="row col-md-12" th:if="${user.revokeAt.isBefore(LocalDate.now())}">
+        <div class="alert alert-warning text-center">注意，您的账户已经到期！</div>
+    </div>
     <div class="row col-md-12">
         <h2>FAQ</h2>
-        <p>1. 客户端需要填写的参数中“协议参数”部分格式为[用户ID:个人秘钥]，不含中括号，其余部分根据节点列表中的内容填写</p>
+        <p>1. 客户端需要填写的参数中“协议参数”部分格式为[用户ID:Token]，不含中括号，其余部分根据节点列表中的内容填写</p>
         <p>2. 节点列表中的状态不代表服务器实时状态，且“启用”不代表“正常”，具体情况请自行测试</p>
         <p>3. 节点总计已使用流量通常少于实际水平，因此使用量达到90%以上时请切换至其他节点</p>
         <p>4. 请保护好自己的个人秘钥，由于泄露个人秘钥导致的账号传播，将视为分享账号行为</p>

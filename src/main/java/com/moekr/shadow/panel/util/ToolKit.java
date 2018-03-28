@@ -17,7 +17,7 @@ import java.util.Map;
 
 public abstract class ToolKit {
 	public static final String BANNER = "Shadow Panel";
-	public static final String VERSION = "0.3.1";
+	public static final String VERSION = "0.3.2";
 
 	public static Map<String, Object> emptyResponseBody() {
 		Map<String, Object> responseBody = new HashMap<>();

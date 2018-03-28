@@ -11,11 +11,13 @@ import com.moekr.shadow.panel.data.entity.User;
 import com.moekr.shadow.panel.logic.service.RecordService;
 import com.moekr.shadow.panel.logic.vo.data.DayData;
 import com.moekr.shadow.panel.logic.vo.data.HourData;
+import com.moekr.shadow.panel.util.Asserts;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.Jsr310Converters;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -65,11 +67,15 @@ public class RecordServiceImpl implements RecordService {
 
 	@Override
 	public String hourData(int userId, int days) {
+		User user = userDAO.findById(userId).orElse(null);
+		Asserts.isTrue(user != null, HttpStatus.NOT_FOUND.value());
 		return parseHourData(recordDAO.hourData(userId, days));
 	}
 
 	@Override
 	public String dayData(int userId, int days) {
+		User user = userDAO.findById(userId).orElse(null);
+		Asserts.isTrue(user != null, HttpStatus.NOT_FOUND.value());
 		return parseDayData(recordDAO.dayData(userId, days), days);
 	}
 

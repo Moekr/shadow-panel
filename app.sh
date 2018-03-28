@@ -5,7 +5,7 @@ path=/opt/shadow-panel
 # Application name.
 name=shadow-panel
 # Application version.
-version=0.3.1
+version=0.3.2
 
 # Application config file. Default config.yml
 config_file=${path}/config.yml

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -85,7 +86,7 @@ public class NodeServiceImpl implements NodeService {
 	public List<NodeModel> available(int userId) {
 		User user = userDAO.findById(userId).orElse(null);
 		Assert.notNull(user, "找不到用户");
-		if (user.getPlan() == null) {
+		if (user.getPlan() == null || user.getRevokeAt().isBefore(LocalDate.now())) {
 			return Collections.emptyList();
 		} else {
 			return nodeDAO.findAllByRevokedAtIsNullAndLevelLessThan(user.getPlan().getLevel()).stream().map(NodeModel::new).collect(Collectors.toList());

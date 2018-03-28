@@ -86,7 +86,7 @@
                     <th>注册时间</th>
                     <th>套餐</th>
                     <th>到期时间</th>
-                    <th>修改到期时间</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -97,7 +97,10 @@
                     <td th:text="${#dates.format(ToolKit.convert(user.createdAt))}"></td>
                     <td th:text="${user.plan}"></td>
                     <td th:text="${#dates.format(ToolKit.convert(user.revokeAt.plusDays(1)))}"></td>
-                    <td><button class="btn btn-xs btn-info" type="button" th:onclick="'changeRevoke('+${ToolKit.timestamp(user.revokeAt)}+','+${user.id}+',\''+${user.username}+'\')'">修改到期时间</button></td>
+                    <td>
+                        <button class="btn btn-xs btn-info" type="button" th:onclick="'changeRevoke('+${ToolKit.timestamp(user.revokeAt)}+','+${user.id}+',\''+${user.username}+'\')'">修改到期时间</button>
+                        <a class="btn btn-xs btn-info" th:href="'../statistics/?u='+${user.id}">查看统计信息</a>
+                    </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(userList)}">
                     <td class="text-center" colspan="7">没有记录！</td>
